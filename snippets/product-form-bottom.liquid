@@ -1,0 +1,42 @@
+{% assign current_variant = product.selected_or_first_available_variant %}
+<div class="bottom_form">
+
+  {% assign sold_out = true %}
+  {% if current_variant.available  %}
+  {% assign sold_out = false %}
+  {% endif %}
+
+  {% assign text = '' %}
+  {% for tag in product.tags %}
+  {% if tag contains 'text_' %}
+  {% assign text = tag | remove:'text_' %}
+  {% endif %}
+  {% endfor %}
+
+  {% if text != blank %}
+  <p><b>{{ text }}</b></p>
+  {% endif %}
+  {% if section.settings.show_quantity %}
+    
+  <div class="js-qty quantity-selector">
+    <span class="js-qty__adjust js-qty__adjust--minus quantity__minus">&minus;</span>
+    <input data-quantity-input class="text quantity js-qty__num" name="quantity" value="1" min="1" aria-label="quantity" pattern="[0-9]*"/>
+    <span class="js-qty__adjust js-qty__adjust--plus quantity__plus">+</span>
+  </div>
+  {% endif %}
+
+
+  <div class="add-to-cart__wrapper">
+    <button type="submit" name="add" data-add-to-cart class="btn btn--large btn--full btn--primary btn--add-to-cart addToCart{% if sold_out %} disabled{% endif %}" {% if sold_out %}disabled="true"{% endif %}>
+      <span data-add-to-cart-text>{% if sold_out %}{{ 'products.product.sold_out' | t }}{% else %}{{ 'products.product.add_to_cart' | t }} →{% endif %}</span>
+      {%- comment -%}
+
+      <span class="unicode">•</span>
+      <span class="add-to-cart__price"><span data-button-price>{{ current_variant.price | money }}</span></span>
+      {%- endcomment -%}
+
+    </button>
+  </div>
+
+</div>
+

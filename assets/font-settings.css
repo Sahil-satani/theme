@@ -1,0 +1,68 @@
+
+@font-face {
+  font-family: Kalam;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n4.2b80162f092311b7a7cd5b42e11d18fc61670668.woff2?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=98f90b7ea285026cc60e951666d673cf57318157bbd8b3c8af8633500f98d766") format("woff2"),
+       url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n4.d467feca92c9e3e3da81ce9b16785be735970426.woff?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=ffb7f3d576fd7629457c089d72f4d56c526f3d0ee156dcd6f79b642867fe274f") format("woff");
+}
+
+@font-face {
+  font-family: Kalam;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n4.2b80162f092311b7a7cd5b42e11d18fc61670668.woff2?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=98f90b7ea285026cc60e951666d673cf57318157bbd8b3c8af8633500f98d766") format("woff2"),
+       url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n4.d467feca92c9e3e3da81ce9b16785be735970426.woff?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=ffb7f3d576fd7629457c089d72f4d56c526f3d0ee156dcd6f79b642867fe274f") format("woff");
+}
+
+@font-face {
+  font-family: Kalam;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n4.2b80162f092311b7a7cd5b42e11d18fc61670668.woff2?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=98f90b7ea285026cc60e951666d673cf57318157bbd8b3c8af8633500f98d766") format("woff2"),
+       url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n4.d467feca92c9e3e3da81ce9b16785be735970426.woff?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=ffb7f3d576fd7629457c089d72f4d56c526f3d0ee156dcd6f79b642867fe274f") format("woff");
+}
+
+
+
+  @font-face {
+  font-family: Kalam;
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n7.58db6f68e2cb2d86480a7d332166de6fe44bfc31.woff2?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=0a2402c55aa9bb741ddd25b4ae18b043a77f8ec54b11cb79f52cbc5cc5e9589d") format("woff2"),
+       url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n7.d9af5556382a9b157ce5b5c0d66c2048d636acc8.woff?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=68beeddc3a463fabb0377ea292b1183c259ee5cb6eb2313f0aebd7ad4f52bd3e") format("woff");
+}
+
+
+
+
+  @font-face {
+  font-family: Kalam;
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n7.58db6f68e2cb2d86480a7d332166de6fe44bfc31.woff2?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=0a2402c55aa9bb741ddd25b4ae18b043a77f8ec54b11cb79f52cbc5cc5e9589d") format("woff2"),
+       url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n7.d9af5556382a9b157ce5b5c0d66c2048d636acc8.woff?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=68beeddc3a463fabb0377ea292b1183c259ee5cb6eb2313f0aebd7ad4f52bd3e") format("woff");
+}
+
+
+
+
+  @font-face {
+  font-family: Kalam;
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n7.58db6f68e2cb2d86480a7d332166de6fe44bfc31.woff2?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=0a2402c55aa9bb741ddd25b4ae18b043a77f8ec54b11cb79f52cbc5cc5e9589d") format("woff2"),
+       url("//www.lovenightshift.com.au/cdn/fonts/kalam/kalam_n7.d9af5556382a9b157ce5b5c0d66c2048d636acc8.woff?h1=bG92ZW5pZ2h0c2hpZnQuY29t&h2=bG92ZW5pZ2h0c2hpZnQuY29tLmF1&h3=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbS5hdQ&h4=bHV4dXJ5c2xlZXBpbmdtYXNrLmNvbQ&h5=bG92ZW5pZ2h0c2hpZnQuY28&h6=bG92ZW5pZ2h0c2hpZnQuYWNjb3VudC5teXNob3BpZnkuY29t&hmac=68beeddc3a463fabb0377ea292b1183c259ee5cb6eb2313f0aebd7ad4f52bd3e") format("woff");
+}
+
+
+
+
+
+

@@ -1,0 +1,199 @@
+<!-- DO NOT REMOVE THE FOLLOWING COMMENT -->
+<!-- (c) Copyright 2014 Caroline Hill. All Rights Reserved. Contact Mlle Caroline Schnapp at mllegeorgesand@gmail.com -->
+<!-- DO NOT REMOVE THE ABOVE COMMENT -->
+
+{% if linklists.gift-wrapping.links.size > 0 and linklists.gift-wrapping.links.first.type == 'product_link' %}
+
+  <div id="is-a-gift" class="cart_gift_product" style="clear: left; margin: 0px 0 0 auto; max-width:450px;" class="clearfix">
+
+    <div class="cover_gift_wrapping">
+  <input type="hidden" name="attributes[gift-wrapping]" value="" />
+              <input id="gift-wrapping" type="checkbox" name="attributes[gift-wrapping]" value="yes" {% if cart.attributes.gift-wrapping %} checked="checked"{% endif %} style="float: none" />
+  <label for="gift-wrapping" style="display:inline; float: none;">
+  <div class="inner_cover_text">
+  <div class="cover_checkbox_giftcart">
+              <span class="checkbox_giftcart"></span>
+  </div>
+  <div class="cover_gift-wrapping_pro">
+            <span class="cart_pro_name">Want it sooner?</span>
+  <span class="cart_giftpro_bottom">Add priority order processing for just $4.99</span>
+  </div>
+    {% comment %}
+  <div class="cover_gift_price">
+              <span class="gift_pro_price">{{ linklists.gift-wrapping.links.first.object.price | money }}</span>
+  </div>
+  {% endcomment %}
+  </div>
+  </label>
+    </div>
+
+  </div>
+
+{% assign id = linklists.gift-wrapping.links.first.object.variants.first.id %}
+
+{% assign gift_wraps_in_cart = 0 %}
+{% for item in cart.items %}
+  {% if item.id == id %}
+    {% assign gift_wraps_in_cart = item.quantity %}
+  {% endif %}
+{% endfor %}
+
+<style>
+  #is-a-gift{
+  display: none;
+  }
+  #updates_{{ id }} { display: none; }
+  .checkbox_giftcart{
+        width: 16px;
+    height: 16px;
+    border: 3px solid rgba(0, 0, 0, 0.2);
+    border-radius: 100%;
+      display: block;
+  margin-right: 5px;
+  }
+ .cover_gift_wrapping .inner_cover_text{
+  display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+  align-items: center;
+  border-radius: 7px;
+    padding:0.7em;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+  .cover_gift_wrapping{
+    position: relative;
+  }
+  .cover_gift_wrapping #gift-wrapping{
+        display: none;
+  }
+  .cover_gift_wrapping input:checked + label .checkbox_giftcart{
+        background-color: #C9A15B;
+    border-color: #C9A15B;
+  }
+   .cover_gift_wrapping input:checked + label .checkbox_giftcart:after{
+    display: block; 
+   }
+  .cover_gift_wrapping input:checked + label .inner_cover_text{
+      background-color: #f6f6f5;
+    border-color: #C9A15B;
+  }
+  .cover_gift_wrapping .cover_checkbox_giftcart{
+/*   width: 10%; */
+    margin-right: 4px;
+  }
+  .cover_gift_wrapping .cover_gift-wrapping_pro{
+    width: 70%;
+    text-align: left;
+  }
+ .cover_gift_wrapping .cover_gift_price{
+      width: 20%;
+  }
+  .cover_gift_wrapping .gift_pro_price{
+  font-weight: bold;
+  }
+  .cover_gift_wrapping .cart_pro_name{
+    font-weight: bold;
+      display: block;
+  }
+  .cover_gift_wrapping .checkbox_giftcart:after{
+       content: "";
+    background-image: url(https://cdn.shopify.com/s/files/1/1423/1224/files/dlf.pt-black-check-mark-png-5463975.png?v=1672986232);
+    background-size: contain;
+    background-position: center;
+    width: 10px;
+    height: 11px;
+    display: none;
+    background-repeat: no-repeat;
+  }
+  @media (max-width: 767px){
+  .cover_gift-wrapping_pro{
+    margin-left: 30px;
+  }
+    .cover_gift_wrapping .cover_checkbox_giftcart{
+      width: 0% !important;
+      margin-top: 5px;
+    }
+    
+    
+  }
+
+  .addtocart_below_images .common_img_part .image svg g path{
+      fill: #000;
+    }
+</style>
+
+<script>
+
+Shopify.Cart = Shopify.Cart || {};
+
+Shopify.Cart.GiftWrap = {};
+
+Shopify.Cart.GiftWrap.set = function() {
+  jQuery.ajax({
+    type: 'POST',
+    url: '/cart/update.js', 
+    data: { updates: { {{ id }}: 1 }, attributes: { 'gift-wrapping': true } }, 
+    dataType: 'json',
+    success: function() { location.href = '/cart'; }
+  });
+}
+
+Shopify.Cart.GiftWrap.remove = function() {
+  jQuery.ajax({
+    type: 'POST',
+    url: '/cart/update.js', 
+    data: { updates: { {{ id }}: 0 }, attributes: { 'gift-wrapping': '' } }, 
+    dataType: 'json',
+    success: function() { location.href = '/cart'; }
+  });
+}
+
+// If we have nothing but gift-wrap items in the cart.
+{% if cart.items.size == 1 and gift_wraps_in_cart > 0 %}
+jQuery(function() {
+  Shopify.Cart.GiftWrap.remove();
+});
+// If we have more than one gift-wrap item in the cart.
+{% elsif gift_wraps_in_cart > 1 %}
+jQuery(function() {
+  Shopify.Cart.GiftWrap.set();
+});
+// If we have a gift-wrap item in the cart but our gift-wrapping cart attribute has not been set.
+{% elsif gift_wraps_in_cart > 0 and cart.attributes.gift-wrapping == blank  %}
+jQuery(function() {
+  Shopify.Cart.GiftWrap.set();
+});
+// If we have no gift-wrap item in the cart but our gift-wrapping cart attribute has been set.
+{% elsif gift_wraps_in_cart == 0 and cart.attributes.gift-wrapping != blank  %}
+jQuery(function() {
+  Shopify.Cart.GiftWrap.set();
+});
+{% endif %}
+
+// When the gift-wrapping checkbox is checked or unchecked.
+jQuery(function() {
+  jQuery('[name="attributes\[gift-wrapping\]"]').change(function() {
+    if (jQuery(this).is(':checked')) {
+      Shopify.Cart.GiftWrap.set();    
+    }
+    else {
+      Shopify.Cart.GiftWrap.remove();
+    }
+  });
+});
+ 
+</script>
+
+{% else %}
+
+<p style="clear: left; margin: 30px 0" class="rte">
+  You attempted to add a gift-wrapping script to your shopping cart, but it won't work because you don't have 
+  a link list with handle <code>gift-wrapping</code> which, in turn, contains a link
+  to your gift-wrapping product. Please review the steps outlined 
+  <a href="http://docs.shopify.com/manual/configuration/store-customization/page-specific/cart-page/add-a-gift-wrap-option">here</a>.
+</p>
+
+{% endif %}

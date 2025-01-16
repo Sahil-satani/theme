@@ -1,0 +1,36 @@
+<style>
+ .bottom_content .bottom_btn{
+  padding: 40px 0 !important;
+} 
+</style>
+
+{% if section.settings.btn--text != blank %}
+  <div class="bottom_content text-center button--scroll" style = "background-color: {{ section.settings.btn-bg-color }}">
+<div class=" wrapper bottom_btn">
+<a  href="javascript:void(0);" class="btn btn--large btn--primary scroll_top_form">{{ section.settings.btn--text }}</a>
+</div>
+</div>
+{% endif %}
+{% schema %}
+  {
+    "name": "Button scroll offer",
+    "settings": [
+      {
+      "type": "text",
+      "id": "btn--text",
+      "label": "Button text"
+      },
+      {
+      "type": "color",
+      "id": "btn-bg-color",
+      "label": "Button background",
+        "default": "#fff"
+      }
+    ],
+    "presets": [
+      {
+      "name": "Button scroll offer"
+      }
+    ]
+  }
+{% endschema %}

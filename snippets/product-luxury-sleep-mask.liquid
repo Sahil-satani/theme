@@ -1,0 +1,1570 @@
+
+{%- case section.settings.image_width -%}
+{%- when 'full' -%}
+{%- assign product_image_width = 'one-whole' -%}
+{%- assign product_description_width = 'one-whole' -%}
+{%- when 'narrow' -%}
+{%- assign product_image_width = 'medium-up--three-eighths' -%}
+{%- assign product_description_width = 'medium-up--five-eighths' -%}
+{%- when 'half' -%}
+{%- assign product_image_width = 'medium-up--one-half' -%}
+{%- assign product_description_width = 'medium-up--one-half' -%}
+{%- else -%}
+{%- assign product_i = 'medium-up--five-eighths' -%}
+{%- assign product_description_width = 'medium-up--three-eighths' -%}
+{%- endcase -%}
+
+<div class="product-page">
+  <div class="product-page-wrapper" style="background-color: {{ section.settings.product_color }}; color: {{ section.settings.product_text_color }};">
+    <div class="wrapper {{ section.settings.align }} content_of_product_page">
+      {% assign current_variant = product.selected_or_first_available_variant %}
+
+      <div class="grid product-single">
+        <div class="grid__item product__media__wrapper {{ product_image_width }}">
+          <div class="product__slides" data-product-slideshow>
+            {% for media in product.media %}
+            {% render 'media', media: media, section: section %}
+            {% endfor %}
+          </div>
+
+          {% assign first_3d_model = product.media | where: "media_type", "model" | first %}
+          {% if first_3d_model %}
+          <button
+                  class="btn--outline btn--ar uppercase"
+                  data-shopify-xr
+                  data-shopify-model3d-id="{{ first_3d_model.id }}"
+                  data-shopify-title="{{ product.title }}"
+                  data-shopify-xr-hidden>
+            {% render 'icon-media-model' %}
+            <span>{{ 'products.product.view_in_space' | t }}</span>
+          </button>
+          {% endif %}
+
+          <noscript>
+            {% for image in product.media %}
+            <img src="{{ image.preview_image | img_url: '900x' }}" alt="{{ image.alt | default: product.title  }}">
+            {% endfor %}
+          </noscript>
+          {% if product.media.size > 1 %}
+          <div data-product-thumbs class="product__thumbs"></div>
+          {%- endif -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+          <div class="product__details">
+            <div class="product__headline">
+
+              <h1 class="product__title">{{ product.title }}</h1>
+            </div>
+            <span class="stamped-product-reviews-badge stamped-main-badge" data-id="{{ product.id }}" data-product-sku="{{ product.handle }}" data-product-type="{{product.type}}" data-product-title="{{product.title}}" style="display: inline-block;"></span>
+
+
+            <div class="coverd_price_sales_text">
+              <div class="product__price uppercase h6 {% if current_variant.compare_at_price > current_variant.price %} on-sale{% endif %}" style="color: {{ section.settings.product_text_color }};">
+                <span data-product-price>{{ current_variant.price | money }}</span>
+                <p class="compare-at h6" style="{% unless current_variant.compare_at_price > current_variant.price %}display: none;{% endunless %} color: {{ section.settings.product_text_color }};">
+                  <span data-compare-price>{{ current_variant.compare_at_price | money }}</span>
+                </p>
+
+                {% liquid
+                assign units = product.variants | map: 'unit_price'
+                if units[0]
+                  assign has_units = true
+                else
+                  assign has_units = false
+                endif 
+              %}
+                {% if has_units %}
+                {% capture show_units %}
+                {%- unless current_variant.unit_price -%}style="display: none;"{%- endunless -%}
+                {% endcapture %}
+                {% capture unit_price_separator %}
+                <span aria-hidden="true">/</span><span class="visually-hidden">{{ 'general.accessibility.unit_price_separator' | t }}&nbsp;</span>
+                {% endcapture %}
+                {% capture unit_price_base_unit %}
+                <span>
+                  {% if current_variant.unit_price_measurement %}
+                  {% if current_variant.unit_price_measurement.reference_value != 1 %}
+                  {{ current_variant.unit_price_measurement.reference_value }}
+                  {%- endif -%}
+                  {{ current_variant.unit_price_measurement.reference_unit }}
+                  {% endif %}
+                </span>
+                {% endcapture %}
+                <p data-product-unit {{ show_units }} class="product__price--unit">
+                  <span class="visually-hidden visually-hidden--inline">{{ 'products.product.unit_price_label' | t }}</span>
+                  <span data-product-unit-price id="unit-price-{{ section.id }}">{{ current_variant.unit_price | money }}</span>
+                  {{unit_price_separator}}
+                  <span data-product-base id="unit-price-base-{{ section.id }}">{{unit_price_base_unit}}</span>
+                </p>
+                {% endif %}
+
+              </div>
+              
+  {% unless template.suffix contains 'black-friday' %}
+              {% if current_variant.compare_at_price > current_variant.price %}
+              <div class="inner_sale_point">
+                <span class="img_hot_sale"><img class="lazyload" data-src="{{ 'hot-sale.png' | asset_url }}" width="20" height="20"></span><span>SALE ENDS TOMORROW!</span>
+              </div>
+              {% endif %}
+                            {% endunless %}
+
+            </div>
+
+
+            <p class="afterpay_installment_p">or make 4 interest-free payments of <span id="afterpay_instalments">{{ product.price | divided_by: 4 | money }}</span> fortnightly with
+              <img style="vertical-align:bottom;height:auto;" width="100" height="21" alt="Afterpay"
+                   data-src="https://cdn.shopify.com/s/files/1/1423/1224/files/afterpay-badge-whiteonblack72x15_3x_8e63c92e-8c5f-44ae-a86f-87965502bb07.png?v=1619929287" class="lazyload fade-in" loading="lazy" async="off"/> 
+            </p> 
+
+            {% if section.settings.product_show_vendor and product.vendor %}
+            <p><a href="{{ product.vendor | url_for_vendor }}" class="border-bottom-link uppercase">{{ product.vendor }}</a></p>
+            {% endif %}
+
+            {% render 'product-form-luxury', product: product, section: section, atc_back_color: section.settings.atc_back_color, atc_text_color: section.settings.atc_text_color %}
+
+            {% if section.settings.enable_imgs != blank %}
+            <div class="addtocart_below_images clearfix">
+
+              {% if section.settings.image_1 != blank or section.settings.text_1 != blank %}
+              <div class="inner_first_img common_img_part clearfix">
+                {% if section.settings.image_1 != blank %}
+                <div class="image">
+                  {{ section.settings.image_1 }}
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_1 != blank %}
+                <div class="text">{{ section.settings.text_1 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+              {% if section.settings.image_2 != blank or section.settings.text_2 != blank %}
+              <div class="inner_second_img common_img_part clearfix">
+                {% if section.settings.image_2 != blank %}
+                <div class="image">
+
+                  {{ section.settings.image_2 }}	
+
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_2 != blank %}
+                <div class="text">{{ section.settings.text_2 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+
+              {% if section.settings.image_3 != blank or section.settings.text_3 != blank %}
+              <div class="inner_third_img common_img_part clearfix">
+                {% if section.settings.image_3 != blank %}
+                <div class="image">
+                  {{ section.settings.image_3 }}
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_3 != blank %}
+                <div class="text">{{ section.settings.text_3 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+              {% if section.settings.image_4 != blank or section.settings.text_4 != blank %}
+              <div class="inner_third_img common_img_part clearfix top_spacing">
+                {% if section.settings.image_4 != blank %}
+                <div class="image">
+                  {{ section.settings.image_4 }}
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_4 != blank %}
+                <div class="text">{{ section.settings.text_4 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+              {% if section.settings.image_5 != blank or section.settings.text_5 != blank %}
+              <div class="inner_third_img common_img_part clearfix top_spacing">
+                {% if section.settings.image_5 != blank %}
+                <div class="image">
+                  {{ section.settings.image_5 }}
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_5 != blank %}
+                <div class="text">{{ section.settings.text_5 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+              {% if section.settings.image_6 != blank or section.settings.text_6 != blank %}
+              <div class="inner_third_img common_img_part clearfix top_spacing">
+                {% if section.settings.image_6 != blank %}
+                <div class="image">
+                  {{ section.settings.image_6 }}
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_6 != blank %}
+                <div class="text">{{ section.settings.text_6 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+            </div>
+            {% endif %}
+			
+            {% if product.metafields.my_fields.choose_product != blank %}
+            {% assign ex_product = all_products[product.metafields.my_fields.choose_product] %}
+            <div class="extra_product_main">
+
+              <div class="extra_product_wrapper"> 
+              <p class="extra_product_header">Pairs Well With</p>
+                <div class="extra_product_inner">
+
+                  <input type="hidden" id="extra_product_id" data-product_id="{{ ex_product.first_available_variant.id }}">
+             
+                  <div class="extra_product_checkbox_wrapper">
+                    <input type="checkbox" id="extra_product">
+                    <label for="extra_product">
+                      <div class="new_checkbox">
+                        <svg id="Capa_1" enable-background="new 0 0 512 512" height="512" viewBox="0 0 512 512" width="512" xmlns="http://www.w3.org/2000/svg"><g><path d="m256 0c-141.49 0-256 114.5-256 256 0 141.49 114.5 256 256 256 141.49 0 256-114.5 256-256 0-141.49-114.5-256-256-256zm-60.914 363.99s-88.422-88.458-94.778-94.802c-14.139-14.139-14.139-37.147 0-51.274 14.175-14.175 37.099-14.175 51.274 0l57.244 57.244c7.118 7.118 18.67 7.069 25.728-.085l125.69-127.502c14.127-14.332 37.208-14.429 51.455-.181 14.03 14.03 14.115 36.942.181 51.081-136.493 138.486-162.414 165.507-162.414 165.507-14.985 14.984-39.383 14.997-54.38.012z"></path></g></svg>
+                      </div>
+                    </label>
+                  </div>
+
+                  <label for="extra_product">
+                    <div class="extra_product_img">
+                      <img src="{{ ex_product.featured_image | img_url: '150x' }}" >
+                    </div>
+
+                    <div class="extra_product_content">
+                      <p><strong>{{ ex_product.title }}</strong></p>	
+
+                      {% assign current_variant = ex_product.selected_or_first_available_variant %}
+                      <div class="product__price uppercase h6{% if current_variant.compare_at_price > current_variant.price %} on-sale{% endif %}" style="color: {{ section.settings.product_text_color }};">
+                        <span data-product-price>{{ current_variant.price | money }}</span>
+                        <p class="compare-at h6" style="{% unless current_variant.compare_at_price > current_variant.price %}display: none;{% endunless %} color: {{ section.settings.product_text_color }};">
+                          <span data-compare-price>{{ current_variant.compare_at_price | money }}</span>
+                        </p>
+                      </div>
+
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
+              {% if product.metafields.custom.pairs_well_with != blank %}
+            
+            <div class="extra_product_main pairs_well_with_covert">
+<div class="extra_product_wrapper"> 
+              <h5 class="">Pairs Well With</h5>
+</div>
+             
+              {% for item in product.metafields.custom.pairs_well_with.value -%}
+                 
+                <div class="extra_product_inner pairs_pro_cover">
+                 {% assign vid = all_products[item.handle].variants.first.id %}
+                     <input  type="checkbox" id="pairs_well_with_pro_{{ item.id }}" data-pairwellpro="{{ vid}}" name="pair_well_with" style="display:none;">
+                  
+                  <div class="extra_product_checkbox_wrapper">
+                    
+                <label for="pairs_well_with_pro_{{ item.id }}">
+                      <div class="new_checkbox">
+                        <svg id="Capa_1" enable-background="new 0 0 512 512" height="512" viewBox="0 0 512 512" width="512" xmlns="http://www.w3.org/2000/svg"><g><path d="m256 0c-141.49 0-256 114.5-256 256 0 141.49 114.5 256 256 256 141.49 0 256-114.5 256-256 0-141.49-114.5-256-256-256zm-60.914 363.99s-88.422-88.458-94.778-94.802c-14.139-14.139-14.139-37.147 0-51.274 14.175-14.175 37.099-14.175 51.274 0l57.244 57.244c7.118 7.118 18.67 7.069 25.728-.085l125.69-127.502c14.127-14.332 37.208-14.429 51.455-.181 14.03 14.03 14.115 36.942.181 51.081-136.493 138.486-162.414 165.507-162.414 165.507-14.985 14.984-39.383 14.997-54.38.012z"></path></g></svg>
+                      </div>
+                    </label>
+                  </div>
+
+                  <label for="pairs_well_with_pro_{{ item.id }}">
+                    <div class="extra_product_img">
+                      <img src="{{ item.featured_image | img_url: '150x' }}" >
+                    </div>
+
+                    <div class="extra_product_content">
+                      <p>{{ item.title }}</p>	
+
+                      {% assign current_variant = item.selected_or_first_available_variant %}
+                      <div class="product__price uppercase h6{% if current_variant.compare_at_price > current_variant.price %} on-sale{% endif %}" style="color: {{ section.settings.product_text_color }};">
+                        <span data-product-price>{{ current_variant.price | money }}</span>
+                        <p class="compare-at h6" style="{% unless current_variant.compare_at_price > current_variant.price %}display: none;{% endunless %} color: {{ section.settings.product_text_color }};">
+                          <span data-compare-price>{{ current_variant.compare_at_price | money }}</span>
+                        </p>
+                      </div>
+
+                    </div>
+                  </label>
+                </div>
+                {% endfor %}
+              
+            </div>
+            {% endif %}
+ 
+{% comment %}
+{% if product.metafields.custom.pairs_well_with != blank %}
+  <div class="pairs_well_with_covert">
+    <div class="pairs_well_title">
+     <h5> Pairs Well With</h5>
+    </div> 
+      <div class="js-grid pairs_well_with" data-grid-large="3" data-grid-small="3">
+{% for item in product.metafields.custom.pairs_well_with.value -%}
+        <div class="pairs_pro_cover text-center">
+ {% assign vid = all_products[item.handle].variants.first.id %}
+ <input  type="checkbox" id="pairs_well_with_pro_{{ item.id }}" data-pairwellpro="{{ vid}}" name="pair_well_with" style="display:none;">
+  <label for="pairs_well_with_pro_{{ item.id }}">
+  <div class="pairs_img"><img src="{{ item.featured_image | img_url: '150x'}}"></div>
+  <div class="pairs_pro_title"><strong>{{ item.title }}</strong></div>
+<div class="pairs_price">
+ {% assign current_variant = item.selected_or_first_available_variant %}
+<div class="product__price uppercase h6 text-center{% if current_variant.compare_at_price > current_variant.price %} on-sale{% endif %}">
+<span data-product-price>{{ current_variant.price | money }}</span>
+<p class="compare-at h6 text-center" style="{% unless current_variant.compare_at_price > current_variant.price %}display: none;{% endunless %}">
+<span data-compare-price>{{ current_variant.compare_at_price | money }}</span>
+ </p>
+</div>
+  </div>
+<div class="pairs_well_checkbox_cover">
+ <div class="pairs_well_checkbox">
+   <svg id="Capa_1" enable-background="new 0 0 512 512" height="512" viewBox="0 0 512 512" width="512" xmlns="http://www.w3.org/2000/svg"><g><path d="m256 0c-141.49 0-256 114.5-256 256 0 141.49 114.5 256 256 256 141.49 0 256-114.5 256-256 0-141.49-114.5-256-256-256zm-60.914 363.99s-88.422-88.458-94.778-94.802c-14.139-14.139-14.139-37.147 0-51.274 14.175-14.175 37.099-14.175 51.274 0l57.244 57.244c7.118 7.118 18.67 7.069 25.728-.085l125.69-127.502c14.127-14.332 37.208-14.429 51.455-.181 14.03 14.03 14.115 36.942.181 51.081-136.493 138.486-162.414 165.507-162.414 165.507-14.985 14.984-39.383 14.997-54.38.012z"></path></g></svg>
+ </div>
+<div class="pair_add_text">Add</div>
+</div>     
+</div>
+          </label>
+{%- endfor %}
+  </div>
+  </div>
+  {% endif %}
+  {% endcomment %}
+            
+            {%- assign product_description_content = product.description | split: '<h6>' | first -%}
+
+
+            {% if product_description_content != blank %}
+            <div class="product-description rte rte--column below_addtocart_des">
+              {{ product_description_content  }}
+            </div>
+            {% else %}
+            <div class="product-description rte rte--column below_addtocart_des">
+              {{ product.description  }}
+            </div>
+            {% endif %}
+
+          </div>
+
+
+          {% if section.settings.social_enable %}
+          {% render 'social-sharing', share_title: product.title, share_permalink: product.url, share_image: product.featured_media.preview_image %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {%- for block in section.blocks -%}
+
+  {% if block.type == 'richtext' %}
+  <div class="product_richtext_main" style="background-color: {{ block.settings.richtext_back_color }}; color: {{ block.settings.richtext_color }};">	
+    <div class="wrapper">
+      <div class="productpage_richtext text-center">
+        {% if block.settings.title != blank %}
+        <h2>{{ block.settings.title }}</h2>
+        {% endif %}
+
+        {% if block.settings.home_page_richtext != blank %}
+        <div class="page__content">
+          {{ block.settings.home_page_richtext }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% endif %}
+    {% if block.type == 'html' %}
+      <div class="product_html index-html{% unless block.settings.full_width %} wrapper{% endunless %}">
+  {{ block.settings.html }}
+</div>
+      {% endif %}
+    
+  {% if block.type == 'side_by_side_image' %}
+
+  <div class="product_sbs_main" style="background-color: {{ block.settings.sbs_back_color }};">
+    <div class="product_side_by_side_image clearfix">
+
+      <div class="inner_img">
+
+        {% if block.settings.image_1 != blank %}
+        <img class="lazyload desktop-tablet-show" data-src="{{ block.settings.image_1 | img_url: '2048x' }}" width="{{ block.settings.image_1.width }}" height="{{ block.settings.image_1.height }}" style="height:auto">
+        {% if block.settings.image_1_mobile != blank %}
+        <img class="lazyload mobile-show" data-src="{{ block.settings.image_1_mobile | img_url: 'original' }}" width="{{ block.settings.image_1_mobile.width }}" height="{{ block.settings.image_1_mobile.height }}" style="height:auto">
+        {% endif %}
+        {% else %}
+        {{ 'image' | placeholder_svg_tag }}
+        {% endif %}
+
+      </div>
+
+      <div class="inner_img">
+
+        {% if block.settings.image_2 != blank %}
+        <img class="lazyload desktop-tablet-show" data-src="{{ block.settings.image_2 | img_url: '2048x' }}" width="{{ block.settings.image_2.width }}" height="{{ block.settings.image_2.height }}" style="height:auto">
+        {% if block.settings.image_2_mobile != blank %}
+        <img class="lazyload mobile-show" data-src="{{ block.settings.image_2_mobile | img_url: 'original' }}" width="{{ block.settings.image_2_mobile.width }}" height="{{ block.settings.image_2_mobile.height }}" style="height:auto">
+        {% endif %}      
+        {% else %}
+        {{ 'image' | placeholder_svg_tag }}
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+  {% endif %}
+
+  {% if block.type == 'side_by_side_review_image' %}
+  <div class="product_review_main" style="background-color: {{ block.settings.review_back_color }}; color: {{ block.settings.review_text_color }};">
+    <div class="product_side_by_side_review_image">
+      <div class="wrapper">
+        <div class="clearfix">
+
+          <div class="inner_side_by_img">
+            {% if block.settings.text_1 != blank %}
+            <div class="inn_text">{{block.settings.text_1}}</div>
+            {% endif %}
+
+            <div class="image">
+              {% if block.settings.image_1 != blank %}
+              <img class="lazyload" data-src="{{ block.settings.image_1 | img_url: 'master' }}" width="{{ block.settings.image_1.width }}" height="{{ block.settings.image_1.height }}" style="height:auto">
+              {% else %}
+              {{ 'image' | placeholder_svg_tag }}
+              {% endif %}
+            </div>
+
+
+          </div>
+
+          <div class="inner_side_by_img">
+            {% if block.settings.text_2 != blank %}
+            <div class="inn_text">{{block.settings.text_2}}</div>
+            {% endif %}
+
+            <div class="image">
+              {% if block.settings.image_2 != blank %}
+              <img class="lazyload" data-src="{{ block.settings.image_2 | img_url: 'master' }}" width="{{ block.settings.image_2.width }}" height="{{ block.settings.image_2.height }}" style="height:auto">
+              {% else %}
+              {{ 'image' | placeholder_svg_tag }}
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+  {% if block.type == 'two_image_with_text' %}
+  <div class="product_two_image_with_text" style="background-color:{{ block.settings.back_color }};">
+    <div class="wrapper">
+
+      <div class="first_part_inner clearfix">
+        <div class="inner_left_part">
+          <div class="inn_inner_left_part">
+            {% if block.settings.title != blank %}
+            <h2>{{ block.settings.title }}</h2>        
+            {% endif %}
+
+            {% if block.settings.richtext_1 != blank %}
+            <div class="richtext desktop_show">
+              {{ block.settings.richtext_1 }}
+            </div>
+            {% endif %}
+          </div>
+
+        </div>
+
+        <div class="inner_right_part">
+
+          <div class="image">
+            {% if block.settings.image_1 != blank %}
+            <img class="lazyload" data-src="{{ block.settings.image_1 | img_url: 'original' }}" width="{{ block.settings.image_1.width }}" height="{{ block.settings.image_1.height }}" style="height:auto">
+            {% else %}
+            {{ 'image' | placeholder_svg_tag }}
+            {% endif %}
+          </div>
+          {% if block.settings.richtext_1 != blank %}
+          <div class="richtext mobile_show">
+            {{ block.settings.richtext_1 }}
+          </div>
+          {% endif %}
+
+        </div>
+
+      </div>
+
+      <div class="second_part_inner clearfix">
+
+        <div class="second_left_part">
+          <div class="image">
+            {% if block.settings.image_2 != blank %}
+            <img class="lazyload" data-src="{{ block.settings.image_2 | img_url: 'original' }}" width="{{ block.settings.image_2.width }}" height="{{ block.settings.image_2.height }}" style="height:auto">
+            {% else %}
+            {{ 'image' | placeholder_svg_tag }}
+            {% endif %}
+          </div>          
+        </div>
+
+        <div class="second_right_part">
+          {% if block.settings.richtext_2 != blank %}
+          <div class="inner_sec_top_text">
+            <p>{{ block.settings.richtext_2 }}</p>
+          </div>
+          {% endif %}
+
+          {% if block.settings.quote_by != blank %}
+          <div class="quote_by">
+            {{ block.settings.quote_by }}
+          </div>
+          {% endif %}
+
+          {% if block.settings.richtext_3 != blank %}
+          <div class="richtext">
+            {{ block.settings.richtext_3 }}
+          </div>
+          {% endif %}
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  {% endif %}
+
+
+  {% if block.type == 'two_columns_img_w_text' %}
+  <div class="product_two_columns_img_w_text" style="background-color:{{ block.settings.back_color }};color:{{ block.settings.text_color }};">
+    <div class="wrapper">
+
+      <div class="top_content text-center">
+        {% if block.settings.title != blank %}
+        <h2 style="color:{{block.settings.heading_color}};">{{ block.settings.title }}</h2>
+        {% endif %}
+
+        {% if block.settings.richtext != blank %}
+        <div class="page__content">
+          {{ block.settings.richtext }}
+        </div>
+        {% endif %}
+      </div>
+
+
+      <div class="coverd_column_all_content clearfix">
+        {% for i in (1..8) %}
+        {% capture enable %}enable_{{i}}{% endcapture %}
+        {% capture image %}image_{{i}}{% endcapture %}
+        {% capture heading %}heading_{{i}}{% endcapture %}
+        {% capture text %}text_{{i}}{% endcapture %}
+
+        {% if block.settings[enable] != blank  %}
+        <div class="inner_column_repeated {% cycle 'right', 'left' %}">
+
+          <div class="inner_left_column">
+            <div class="image">
+              {% if block.settings[image] != blank %}
+              <img class="lazyload" data-src="{{ block.settings[image] | img_url: 'original' }}" width="{{ block.settings[image].width }}" height="{{ block.settings[image].height }}" style="height:auto">
+              {% else %}
+              {{ 'image' | placeholder_svg_tag }}
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="inner_right_column">
+            {% if block.settings[heading] != blank %}
+            <div class="column_small_heading">
+              <p style="color:{{block.settings.heading_color}};">{{ block.settings[heading] }}</p>
+            </div>
+            {% endif %}
+
+            {% if block.settings[text] != blank %}
+            <div class="richtext">
+              {{ block.settings[text] }}
+            </div>
+            {% endif %}
+
+
+          </div>        
+
+
+
+        </div>
+        {% endif %}
+
+        {% endfor %}
+
+      </div>
+
+
+      {% if block.settings.enable_review_img != blank  %}
+      <div class="Review_image_side_by_side clearfix">
+        {% if block.settings.review_image_1 != blank %}
+        <div class="image first_img">
+          <img class="lazyload" data-src="{{ block.settings.review_image_1 | img_url: 'large' }}" width="{{ block.settings.review_image_1.width }}" height="{{ block.settings.review_image_1.height }}" style="height:auto">
+        </div>
+        {% endif %}
+
+        {% if block.settings.review_image_2 != blank %}
+        <div class="image second_img">
+          <img class="lazyload" data-src="{{ block.settings.review_image_2 | img_url: 'large' }}" width="{{ block.settings.review_image_2.width }}" height="{{ block.settings.review_image_2.height }}" style="height:auto">
+        </div>
+        {% endif %}
+
+      </div>
+      {% endif %}
+
+
+    </div>
+  </div>
+  {% endif %}
+
+
+  {% if block.type == 'image_with_text' %}
+  <div class="product_image_with_text_section" style="background-color:{{ block.settings.back_color }};color:{{ block.settings.text_color }};">
+
+    {% if block.settings.enable_1 != blank %}
+    <div class="inner_image_right_text_left clearfix">
+      <div class="content_left">
+        <div class="inner_content_left">
+          {% if block.settings.title != blank %}
+          <h2 style="color:{{block.settings.heading_color}};">{{ block.settings.title }}</h2>
+          {% endif %}
+
+          {% if block.settings.richtext != blank %}
+          <div class="richtext">
+            {{ block.settings.richtext }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="image_right_side">
+        <div class="image">
+          {% if block.settings.image_1 != blank %}
+          <img class="lazyload" data-src="{{ block.settings.image_1 | img_url: 'original' }}" width="{{ block.settings.image_1.width }}" height="{{ block.settings.image_1.height }}" style="height:auto">
+          {% else %}
+          {{ 'image' | placeholder_svg_tag }}
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+    {% endif %}
+
+    {% if block.settings.enable_2 != blank %}
+    <div class="inner_image_left_text_right clearfix">
+
+      <div class="image_left_side">
+        <div class="image">
+          {% if block.settings.image_2 != blank %}
+          <img class="lazyload" data-src="{{ block.settings.image_2 | img_url: 'original' }}" width="{{ block.settings.image_2.width }}" height="{{ block.settings.image_2.height }}" style="height:auto">
+          {% else %}
+          {{ 'image' | placeholder_svg_tag }}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="content_right">
+        <div class="inner_content_right">
+          {% if block.settings.title_2 != blank %}
+          <h2 style="color:{{block.settings.heading_color}};">{{ block.settings.title_2 }}</h2>
+          {% endif %}
+
+          {% if block.settings.richtext_2 != blank %}
+          <div class="richtext">
+            {{ block.settings.richtext_2 }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+ 
+  {% endif %}
+
+
+     {% if block.type == 'image_with_text_new' %}
+  <div class="product_image_with_text_section" style="background-color:{{ block.settings.back_color }};color:{{ block.settings.text_color }};">
+
+    {% if block.settings.enable_1 != blank %}
+    <div class="inner_image_right_text_left clearfix wrapper">
+      <div class="content_left content_left_equal">
+        <div class="inner_content_left_spacing">
+          {% if block.settings.title != blank %}
+          <h2 style="color:{{block.settings.heading_color}};">{{ block.settings.title }}</h2>
+          {% endif %}
+
+          {% if block.settings.richtext != blank %}
+          <div class="richtext">
+            {{ block.settings.richtext }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="image_right_side image_right_side_equal">
+        <div class="image">
+          {% if block.settings.image_1 != blank %}
+          <img class="lazyload" data-src="{{ block.settings.image_1 | img_url: 'original' }}" width="{{ block.settings.image_1.width }}" height="{{ block.settings.image_1.height }}" style="height:auto">
+          {% else %}
+          {{ 'image' | placeholder_svg_tag }}
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+    {% endif %}
+
+    {% if block.settings.enable_2 != blank %}
+    <div class="inner_image_left_text_right clearfix wrapper">
+
+      <div class="image_left_side image_left_side_equal">
+        <div class="image">
+          {% if block.settings.image_2 != blank %}
+          <img class="lazyload" data-src="{{ block.settings.image_2 | img_url: 'original' }}" width="{{ block.settings.image_2.width }}" height="{{ block.settings.image_2.height }}" style="height:auto">
+          {% else %}
+          {{ 'image' | placeholder_svg_tag }}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="content_right content_right_equal">
+        <div class="{% if block.settings.enable_full_width == true %}inner_content_right{% endif %}inner_content_right_spacing">
+          {% if block.settings.title_2 != blank %}
+          <h2 style="color:{{block.settings.heading_color}};">{{ block.settings.title_2 }}</h2>
+          {% endif %}
+
+          {% if block.settings.richtext_2 != blank %}
+          <div class="richtext">
+            {{ block.settings.richtext_2 }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  {% endif %}
+
+
+  {% if block.type == 'addtocart_section' %}
+  <div class="addtocart_section_extra" style="background-color:{{ block.settings.back_color }};color:{{ block.settings.text_color }};">
+
+    <div class="wrapper">
+      <div class="inner_addtocart_section clearfix">
+        <div class="left_addtocart_part">
+          {% if block.settings.title != blank %}
+          <h2 style="color:{{block.settings.text_color}};">{{ block.settings.title }}</h2>
+          {% endif %}
+
+          {% if block.settings.richtext != blank %}
+          <div class="richtext">
+            {{ block.settings.richtext }}
+          </div>
+          {% endif %}  
+        </div>
+
+        <div class="right_addtocart_part">
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          {% assign sold_out = true %}
+          {% if current_variant.available  %}
+          {% assign sold_out = false %}
+          {% endif %}
+          <div class="extra_addtocart_btn">
+
+            <div class="add-to-cart__wrapper bottom_addtocart_btn">
+              <button type="submit" name="add" class="btn btn--large btn--full btn--primary btn--add-to-cart addToCart {% if sold_out %} disabled{% endif %}" {% if sold_out %}disabled="true"{% endif %} style="background-color: {{ block.settings.atc_back_color }}!important; color: {{ block.settings.atc_text_color }}!important; border-color: {{ block.settings.atc_back_color }}!important; border-radius: 5px;">
+                <span data-add-to-cart-text>{% if sold_out %}{{ 'products.product.sold_out' | t }}{% else %}Add to cart →{% endif %}</span>
+                {%- comment -%}
+
+                <span class="unicode">•</span>
+                <span class="add-to-cart__price"><span data-button-price>{{ current_variant.price | money }}</span></span>
+                {%- endcomment -%}
+
+              </button>
+            </div>
+
+          </div>
+
+          <div class="guarantee_img_text">
+
+            {% if block.settings.guarantee_img != blank %}
+            <div class="guarantee_img">
+              <div class="img">
+                <img class="lazyload" data-src="{{ block.settings.guarantee_img | img_url: 'medium' }}" width="{{ block.settings.guarantee_img.width }}" height="{{ block.settings.guarantee_img.height }}" style="height:auto">
+              </div>
+            </div>
+            {% endif %}
+
+            {% if block.settings.guarantee_text != blank %}
+            <div class="guarantee_text">
+              {{ block.settings.guarantee_text }}
+            </div>
+            {% endif %}
+
+          </div>
+
+
+        </div>
+
+      </div>
+    </div>
+
+
+  </div>
+  {% endif %}
+{% if block.type == 'button_scroll' %}
+{% if block.settings.prod-btn--text != blank %}
+    <div class="bottom_content text-center button--scroll" style = "background-color: {{ block.settings.prod-btn-bg-color }}; padding: 40px 0;">
+<div class=" wrapper bottom_btn">
+<a  href="javascript:void(0);" class="btn btn--large btn--primary scroll_top_form">{{ block.settings.prod-btn--text }}</a>
+</div>
+</div>
+  {% endif %}
+  {% endif %}
+
+    {% if block.type == 'image_with_points' %}
+      <div class="image_with_points_main section">
+        <div class="wrapper">
+          <div class="image_with_points_main_heading">
+            {% if block.settings.image_with_points_heading != blank %}
+              <div class="image_points_heading text-center">
+                <h3>{{ block.settings.image_with_points_heading }}</h3>
+              </div>
+            {% endif %}
+            {% if block.settings.image_with_points_subheading != blank %}
+              <div class="image_points_subheading text-center">
+                <p>{{ block.settings.image_with_points_subheading }}</p>
+              </div>
+            {% endif %}
+          </div>
+          <div class="image_points_side grid">
+            {% if block.settings.image_with_points_image != blank %}
+              <div class="image_left grid__item two-fifths small-down--one-whole">
+                <img class="lazyload" data-src="{{ block.settings.image_with_points_image | img_url: 'original' }}" width="{{ block.settings.image_with_points_image.width }}" height="{{ block.settings.image_with_points_image.height }}" style="height:auto">
+              </div>
+            {% endif %}
+            {% if block.settings.image_with_points_html != blank %}
+              <div class="points_right grid__item three-fifths small-down--one-whole">
+                {{ block.settings.image_with_points_html }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+  {% if block.type == 'faq' %}
+  <div class="product_faq_main_section" data-section-id="{{ block.id }}" data-section-type="page-faq" style="background-color:{{ block.settings.back_color }};color:{{ block.settings.text_color }};">
+    <div class="wrapper">
+      <div class="inner_faq_content">
+        {% if block.settings.title != blank %}
+        <h2 class="text-center ">{{ block.settings.title }}</h2>
+        {% endif %}
+        {% for i in (1..10) %}
+        {% capture enable %}enable_{{i}}{% endcapture %}
+        {% capture title %}title_{{i}}{% endcapture %}
+        {% capture content %}content_{{i}}{% endcapture %}
+        {% capture image_one %}image_one_{{i}}{% endcapture %}
+        {% capture image_two %}image_two_{{i}}{% endcapture %}
+
+        {% if block.settings[enable] != blank %}
+        <div class="faq__wrapper">
+          <button class="faq__button"
+                  data-accordion-toggle="accordion-{{ forloop.index }}-{{ block.id }}"
+                  aria-controls="accordion-{{ key }}"
+                  aria-haspopup="true" 
+                  aria-expanded="false"
+                  style="color:{{ block.settings.text_color }};">
+            <span class="accordion__title">{{ block.settings[title] }}</span>
+            <span class="accordion__chevron">
+              {% render 'icon-arrow-medium-right' %}
+              <span class="a11y__show visually-hidden">{{ 'general.accessibility.expand_menu' | t }}</span>
+              <span class="a11y__hide visually-hidden">{{ 'general.accessibility.hide_menu' | t }}</span>
+            </span>
+          </button>
+          <div class="accordion__content accordion__content--faq" 
+               data-accordion 
+               id="accordion-{{ forloop.index }}-{{ block.id }}">
+            <span {{ block.shopify_attributes }}></span>
+            {{ block.settings[content] }}
+
+            {% if block.settings[image_one] != blank or block.settings[image_two] != blank %}
+            <div class="content_images clearfix">
+              {% if block.settings[image_one] != blank %}
+              <div class="inner_img">
+                <img class="lazyload" data-src="{{ block.settings[image_one] | img_url: 'original' }}" width="{{ block.settings[image_one].width }}" height="{{ block.settings[image_one].height }}" style="height:auto">
+              </div>
+              {% endif %}
+              {% if block.settings[image_two] != blank %}
+              <div class="inner_img">
+                <img class="lazyload" data-src="{{ block.settings[image_two] | img_url: 'original' }}" width="{{ block.settings[image_two].width }}" height="{{ block.settings[image_two].height }}" style="height:auto">>
+              </div>
+              {% endif %}
+
+            </div>
+            {% endif %}
+
+
+          </div>
+        </div>
+        {% endif %}
+
+
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if block.type == 'review_app' %}
+
+  <div style="background-color: {{ block.settings.back_color }}">
+    <div class="wrapper">
+      {% if block.settings.app_review_title != blank %}
+      <h2>{{ block.settings.app_review_title }}</h2>
+      {% endif %}
+
+
+      {{ block.settings.title }}
+    </div> 
+  </div>
+
+  {% endif %}
+
+
+ {% if block.type == 'how_we_compare' %}
+   <div class= "how-we-compare section">
+<div class="wrapper">
+<div class="heading text-center">
+  {% if block.settings.heading != blank %}
+<h2>{{ block.settings.heading }}</h2>
+    {% endif %}
+    {% if block.settings.subheading != blank %}
+<p>{{ block.settings.subheading }}</p>
+      {% endif %}
+</div>
+  <div class="inner_block_content_heading">
+    <div class="last-contents">
+     {{ block.settings.coulm_title }}
+    </div>
+  </div>
+  <div class="inner_block_content">
+    {% for i in (1..10) %}
+      {% capture title %}title_{{ i }}{% endcapture %}
+   {% capture content %}content_{{ i }}{% endcapture %}
+      <div class="inner_compare">
+         {% if block.settings[title] != blank %}
+            <div class="compare_heading">
+              <p>{{ block.settings[title] }}</p>
+            </div>
+        {% endif %}
+      
+        <div class="inner_yes_no">
+        {{ block.settings[content] }}
+        </div>
+      </div>
+      {% endfor %}
+  </div>
+</div>
+</div>
+
+   {% endif %}
+
+    
+
+  {% if block.type == 'review' %}
+  <script>!function(i){"use strict";"function"==typeof define&&define.amd?define(["jquery"],i):"undefined"!=typeof exports?module.exports=i(require("jquery")):i(jQuery)}(function(i){"use strict";var e=window.Slick||{};(e=function(){var e=0;return function(t,o){var s,n=this;n.defaults={accessibility:!0,adaptiveHeight:!1,appendArrows:i(t),appendDots:i(t),arrows:!0,asNavFor:null,prevArrow:'<button class="slick-prev" aria-label="Previous" type="button">Previous</button>',nextArrow:'<button class="slick-next" aria-label="Next" type="button">Next</button>',autoplay:!1,autoplaySpeed:3e3,centerMode:!1,centerPadding:"50px",cssEase:"ease",customPaging:function(e,t){return i('<button type="button" />').text(t+1)},dots:!1,dotsClass:"slick-dots",draggable:!0,easing:"linear",edgeFriction:.35,fade:!1,focusOnSelect:!1,focusOnChange:!1,infinite:!0,initialSlide:0,lazyLoad:"ondemand",mobileFirst:!1,pauseOnHover:!0,pauseOnFocus:!0,pauseOnDotsHover:!1,respondTo:"window",responsive:null,rows:1,rtl:!1,slide:"",slidesPerRow:1,slidesToShow:1,slidesToScroll:1,speed:500,swipe:!0,swipeToSlide:!1,touchMove:!0,touchThreshold:5,useCSS:!0,useTransform:!0,variableWidth:!1,vertical:!1,verticalSwiping:!1,waitForAnimate:!0,zIndex:1e3},n.initials={animating:!1,dragging:!1,autoPlayTimer:null,currentDirection:0,currentLeft:null,currentSlide:0,direction:1,$dots:null,listWidth:null,listHeight:null,loadIndex:0,$nextArrow:null,$prevArrow:null,scrolling:!1,slideCount:null,slideWidth:null,$slideTrack:null,$slides:null,sliding:!1,slideOffset:0,swipeLeft:null,swiping:!1,$list:null,touchObject:{},transformsEnabled:!1,unslicked:!1},i.extend(n,n.initials),n.activeBreakpoint=null,n.animType=null,n.animProp=null,n.breakpoints=[],n.breakpointSettings=[],n.cssTransitions=!1,n.focussed=!1,n.interrupted=!1,n.hidden="hidden",n.paused=!0,n.positionProp=null,n.respondTo=null,n.rowCount=1,n.shouldClick=!0,n.$slider=i(t),n.$slidesCache=null,n.transformType=null,n.transitionType=null,n.visibilityChange="visibilitychange",n.windowWidth=0,n.windowTimer=null,s=i(t).data("slick")||{},n.options=i.extend({},n.defaults,o,s),n.currentSlide=n.options.initialSlide,n.originalSettings=n.options,void 0!==document.mozHidden?(n.hidden="mozHidden",n.visibilityChange="mozvisibilitychange"):void 0!==document.webkitHidden&&(n.hidden="webkitHidden",n.visibilityChange="webkitvisibilitychange"),n.autoPlay=i.proxy(n.autoPlay,n),n.autoPlayClear=i.proxy(n.autoPlayClear,n),n.autoPlayIterator=i.proxy(n.autoPlayIterator,n),n.changeSlide=i.proxy(n.changeSlide,n),n.clickHandler=i.proxy(n.clickHandler,n),n.selectHandler=i.proxy(n.selectHandler,n),n.setPosition=i.proxy(n.setPosition,n),n.swipeHandler=i.proxy(n.swipeHandler,n),n.dragHandler=i.proxy(n.dragHandler,n),n.keyHandler=i.proxy(n.keyHandler,n),n.instanceUid=e++,n.htmlExpr=/^(?:\s*(<[\w\W]+>)[^>]*)$/,n.registerBreakpoints(),n.init(!0)}}()).prototype.activateADA=function(){this.$slideTrack.find(".slick-active").attr({"aria-hidden":"false"}).find("a, input, button, select").attr({tabindex:"0"})},e.prototype.addSlide=e.prototype.slickAdd=function(e,t,o){var s=this;if("boolean"==typeof t)o=t,t=null;else if(t<0||t>=s.slideCount)return!1;s.unload(),"number"==typeof t?0===t&&0===s.$slides.length?i(e).appendTo(s.$slideTrack):o?i(e).insertBefore(s.$slides.eq(t)):i(e).insertAfter(s.$slides.eq(t)):!0===o?i(e).prependTo(s.$slideTrack):i(e).appendTo(s.$slideTrack),s.$slides=s.$slideTrack.children(this.options.slide),s.$slideTrack.children(this.options.slide).detach(),s.$slideTrack.append(s.$slides),s.$slides.each(function(e,t){i(t).attr("data-slick-index",e)}),s.$slidesCache=s.$slides,s.reinit()},e.prototype.animateHeight=function(){var i=this;if(1===i.options.slidesToShow&&!0===i.options.adaptiveHeight&&!1===i.options.vertical){var e=i.$slides.eq(i.currentSlide).outerHeight(!0);i.$list.animate({height:e},i.options.speed)}},e.prototype.animateSlide=function(e,t){var o={},s=this;s.animateHeight(),!0===s.options.rtl&&!1===s.options.vertical&&(e=-e),!1===s.transformsEnabled?!1===s.options.vertical?s.$slideTrack.animate({left:e},s.options.speed,s.options.easing,t):s.$slideTrack.animate({top:e},s.options.speed,s.options.easing,t):!1===s.cssTransitions?(!0===s.options.rtl&&(s.currentLeft=-s.currentLeft),i({animStart:s.currentLeft}).animate({animStart:e},{duration:s.options.speed,easing:s.options.easing,step:function(i){i=Math.ceil(i),!1===s.options.vertical?(o[s.animType]="translate("+i+"px, 0px)",s.$slideTrack.css(o)):(o[s.animType]="translate(0px,"+i+"px)",s.$slideTrack.css(o))},complete:function(){t&&t.call()}})):(s.applyTransition(),e=Math.ceil(e),!1===s.options.vertical?o[s.animType]="translate3d("+e+"px, 0px, 0px)":o[s.animType]="translate3d(0px,"+e+"px, 0px)",s.$slideTrack.css(o),t&&setTimeout(function(){s.disableTransition(),t.call()},s.options.speed))},e.prototype.getNavTarget=function(){var e=this,t=e.options.asNavFor;return t&&null!==t&&(t=i(t).not(e.$slider)),t},e.prototype.asNavFor=function(e){var t=this.getNavTarget();null!==t&&"object"==typeof t&&t.each(function(){var t=i(this).slick("getSlick");t.unslicked||t.slideHandler(e,!0)})},e.prototype.applyTransition=function(i){var e=this,t={};!1===e.options.fade?t[e.transitionType]=e.transformType+" "+e.options.speed+"ms "+e.options.cssEase:t[e.transitionType]="opacity "+e.options.speed+"ms "+e.options.cssEase,!1===e.options.fade?e.$slideTrack.css(t):e.$slides.eq(i).css(t)},e.prototype.autoPlay=function(){var i=this;i.autoPlayClear(),i.slideCount>i.options.slidesToShow&&(i.autoPlayTimer=setInterval(i.autoPlayIterator,i.options.autoplaySpeed))},e.prototype.autoPlayClear=function(){var i=this;i.autoPlayTimer&&clearInterval(i.autoPlayTimer)},e.prototype.autoPlayIterator=function(){var i=this,e=i.currentSlide+i.options.slidesToScroll;i.paused||i.interrupted||i.focussed||(!1===i.options.infinite&&(1===i.direction&&i.currentSlide+1===i.slideCount-1?i.direction=0:0===i.direction&&(e=i.currentSlide-i.options.slidesToScroll,i.currentSlide-1==0&&(i.direction=1))),i.slideHandler(e))},e.prototype.buildArrows=function(){var e=this;!0===e.options.arrows&&(e.$prevArrow=i(e.options.prevArrow).addClass("slick-arrow"),e.$nextArrow=i(e.options.nextArrow).addClass("slick-arrow"),e.slideCount>e.options.slidesToShow?(e.$prevArrow.removeClass("slick-hidden").removeAttr("aria-hidden tabindex"),e.$nextArrow.removeClass("slick-hidden").removeAttr("aria-hidden tabindex"),e.htmlExpr.test(e.options.prevArrow)&&e.$prevArrow.prependTo(e.options.appendArrows),e.htmlExpr.test(e.options.nextArrow)&&e.$nextArrow.appendTo(e.options.appendArrows),!0!==e.options.infinite&&e.$prevArrow.addClass("slick-disabled").attr("aria-disabled","true")):e.$prevArrow.add(e.$nextArrow).addClass("slick-hidden").attr({"aria-disabled":"true",tabindex:"-1"}))},e.prototype.buildDots=function(){var e,t,o=this;if(!0===o.options.dots){for(o.$slider.addClass("slick-dotted"),t=i("<ul />").addClass(o.options.dotsClass),e=0;e<=o.getDotCount();e+=1)t.append(i("<li />").append(o.options.customPaging.call(this,o,e)));o.$dots=t.appendTo(o.options.appendDots),o.$dots.find("li").first().addClass("slick-active")}},e.prototype.buildOut=function(){var e=this;e.$slides=e.$slider.children(e.options.slide+":not(.slick-cloned)").addClass("slick-slide"),e.slideCount=e.$slides.length,e.$slides.each(function(e,t){i(t).attr("data-slick-index",e).data("originalStyling",i(t).attr("style")||"")}),e.$slider.addClass("slick-slider"),e.$slideTrack=0===e.slideCount?i('<div class="slick-track"/>').appendTo(e.$slider):e.$slides.wrapAll('<div class="slick-track"/>').parent(),e.$list=e.$slideTrack.wrap('<div class="slick-list"/>').parent(),e.$slideTrack.css("opacity",0),!0!==e.options.centerMode&&!0!==e.options.swipeToSlide||(e.options.slidesToScroll=1),i("img[data-lazy]",e.$slider).not("[src]").addClass("slick-loading"),e.setupInfinite(),e.buildArrows(),e.buildDots(),e.updateDots(),e.setSlideClasses("number"==typeof e.currentSlide?e.currentSlide:0),!0===e.options.draggable&&e.$list.addClass("draggable")},e.prototype.buildRows=function(){var i,e,t,o,s,n,r,l=this;if(o=document.createDocumentFragment(),n=l.$slider.children(),l.options.rows>1){for(r=l.options.slidesPerRow*l.options.rows,s=Math.ceil(n.length/r),i=0;i<s;i++){var d=document.createElement("div");for(e=0;e<l.options.rows;e++){var a=document.createElement("div");for(t=0;t<l.options.slidesPerRow;t++){var c=i*r+(e*l.options.slidesPerRow+t);n.get(c)&&a.appendChild(n.get(c))}d.appendChild(a)}o.appendChild(d)}l.$slider.empty().append(o),l.$slider.children().children().children().css({width:100/l.options.slidesPerRow+"%",display:"inline-block"})}},e.prototype.checkResponsive=function(e,t){var o,s,n,r=this,l=!1,d=r.$slider.width(),a=window.innerWidth||i(window).width();if("window"===r.respondTo?n=a:"slider"===r.respondTo?n=d:"min"===r.respondTo&&(n=Math.min(a,d)),r.options.responsive&&r.options.responsive.length&&null!==r.options.responsive){s=null;for(o in r.breakpoints)r.breakpoints.hasOwnProperty(o)&&(!1===r.originalSettings.mobileFirst?n<r.breakpoints[o]&&(s=r.breakpoints[o]):n>r.breakpoints[o]&&(s=r.breakpoints[o]));null!==s?null!==r.activeBreakpoint?(s!==r.activeBreakpoint||t)&&(r.activeBreakpoint=s,"unslick"===r.breakpointSettings[s]?r.unslick(s):(r.options=i.extend({},r.originalSettings,r.breakpointSettings[s]),!0===e&&(r.currentSlide=r.options.initialSlide),r.refresh(e)),l=s):(r.activeBreakpoint=s,"unslick"===r.breakpointSettings[s]?r.unslick(s):(r.options=i.extend({},r.originalSettings,r.breakpointSettings[s]),!0===e&&(r.currentSlide=r.options.initialSlide),r.refresh(e)),l=s):null!==r.activeBreakpoint&&(r.activeBreakpoint=null,r.options=r.originalSettings,!0===e&&(r.currentSlide=r.options.initialSlide),r.refresh(e),l=s),e||!1===l||r.$slider.trigger("breakpoint",[r,l])}},e.prototype.changeSlide=function(e,t){var o,s,n,r=this,l=i(e.currentTarget);switch(l.is("a")&&e.preventDefault(),l.is("li")||(l=l.closest("li")),n=r.slideCount%r.options.slidesToScroll!=0,o=n?0:(r.slideCount-r.currentSlide)%r.options.slidesToScroll,e.data.message){case"previous":s=0===o?r.options.slidesToScroll:r.options.slidesToShow-o,r.slideCount>r.options.slidesToShow&&r.slideHandler(r.currentSlide-s,!1,t);break;case"next":s=0===o?r.options.slidesToScroll:o,r.slideCount>r.options.slidesToShow&&r.slideHandler(r.currentSlide+s,!1,t);break;case"index":var d=0===e.data.index?0:e.data.index||l.index()*r.options.slidesToScroll;r.slideHandler(r.checkNavigable(d),!1,t),l.children().trigger("focus");break;default:return}},e.prototype.checkNavigable=function(i){var e,t;if(e=this.getNavigableIndexes(),t=0,i>e[e.length-1])i=e[e.length-1];else for(var o in e){if(i<e[o]){i=t;break}t=e[o]}return i},e.prototype.cleanUpEvents=function(){var e=this;e.options.dots&&null!==e.$dots&&(i("li",e.$dots).off("click.slick",e.changeSlide).off("mouseenter.slick",i.proxy(e.interrupt,e,!0)).off("mouseleave.slick",i.proxy(e.interrupt,e,!1)),!0===e.options.accessibility&&e.$dots.off("keydown.slick",e.keyHandler)),e.$slider.off("focus.slick blur.slick"),!0===e.options.arrows&&e.slideCount>e.options.slidesToShow&&(e.$prevArrow&&e.$prevArrow.off("click.slick",e.changeSlide),e.$nextArrow&&e.$nextArrow.off("click.slick",e.changeSlide),!0===e.options.accessibility&&(e.$prevArrow&&e.$prevArrow.off("keydown.slick",e.keyHandler),e.$nextArrow&&e.$nextArrow.off("keydown.slick",e.keyHandler))),e.$list.off("touchstart.slick mousedown.slick",e.swipeHandler),e.$list.off("touchmove.slick mousemove.slick",e.swipeHandler),e.$list.off("touchend.slick mouseup.slick",e.swipeHandler),e.$list.off("touchcancel.slick mouseleave.slick",e.swipeHandler),e.$list.off("click.slick",e.clickHandler),i(document).off(e.visibilityChange,e.visibility),e.cleanUpSlideEvents(),!0===e.options.accessibility&&e.$list.off("keydown.slick",e.keyHandler),!0===e.options.focusOnSelect&&i(e.$slideTrack).children().off("click.slick",e.selectHandler),i(window).off("orientationchange.slick.slick-"+e.instanceUid,e.orientationChange),i(window).off("resize.slick.slick-"+e.instanceUid,e.resize),i("[draggable!=true]",e.$slideTrack).off("dragstart",e.preventDefault),i(window).off("load.slick.slick-"+e.instanceUid,e.setPosition)},e.prototype.cleanUpSlideEvents=function(){var e=this;e.$list.off("mouseenter.slick",i.proxy(e.interrupt,e,!0)),e.$list.off("mouseleave.slick",i.proxy(e.interrupt,e,!1))},e.prototype.cleanUpRows=function(){var i,e=this;e.options.rows>1&&((i=e.$slides.children().children()).removeAttr("style"),e.$slider.empty().append(i))},e.prototype.clickHandler=function(i){!1===this.shouldClick&&(i.stopImmediatePropagation(),i.stopPropagation(),i.preventDefault())},e.prototype.destroy=function(e){var t=this;t.autoPlayClear(),t.touchObject={},t.cleanUpEvents(),i(".slick-cloned",t.$slider).detach(),t.$dots&&t.$dots.remove(),t.$prevArrow&&t.$prevArrow.length&&(t.$prevArrow.removeClass("slick-disabled slick-arrow slick-hidden").removeAttr("aria-hidden aria-disabled tabindex").css("display",""),t.htmlExpr.test(t.options.prevArrow)&&t.$prevArrow.remove()),t.$nextArrow&&t.$nextArrow.length&&(t.$nextArrow.removeClass("slick-disabled slick-arrow slick-hidden").removeAttr("aria-hidden aria-disabled tabindex").css("display",""),t.htmlExpr.test(t.options.nextArrow)&&t.$nextArrow.remove()),t.$slides&&(t.$slides.removeClass("slick-slide slick-active slick-center slick-visible slick-current").removeAttr("aria-hidden").removeAttr("data-slick-index").each(function(){i(this).attr("style",i(this).data("originalStyling"))}),t.$slideTrack.children(this.options.slide).detach(),t.$slideTrack.detach(),t.$list.detach(),t.$slider.append(t.$slides)),t.cleanUpRows(),t.$slider.removeClass("slick-slider"),t.$slider.removeClass("slick-initialized"),t.$slider.removeClass("slick-dotted"),t.unslicked=!0,e||t.$slider.trigger("destroy",[t])},e.prototype.disableTransition=function(i){var e=this,t={};t[e.transitionType]="",!1===e.options.fade?e.$slideTrack.css(t):e.$slides.eq(i).css(t)},e.prototype.fadeSlide=function(i,e){var t=this;!1===t.cssTransitions?(t.$slides.eq(i).css({zIndex:t.options.zIndex}),t.$slides.eq(i).animate({opacity:1},t.options.speed,t.options.easing,e)):(t.applyTransition(i),t.$slides.eq(i).css({opacity:1,zIndex:t.options.zIndex}),e&&setTimeout(function(){t.disableTransition(i),e.call()},t.options.speed))},e.prototype.fadeSlideOut=function(i){var e=this;!1===e.cssTransitions?e.$slides.eq(i).animate({opacity:0,zIndex:e.options.zIndex-2},e.options.speed,e.options.easing):(e.applyTransition(i),e.$slides.eq(i).css({opacity:0,zIndex:e.options.zIndex-2}))},e.prototype.filterSlides=e.prototype.slickFilter=function(i){var e=this;null!==i&&(e.$slidesCache=e.$slides,e.unload(),e.$slideTrack.children(this.options.slide).detach(),e.$slidesCache.filter(i).appendTo(e.$slideTrack),e.reinit())},e.prototype.focusHandler=function(){var e=this;e.$slider.off("focus.slick blur.slick").on("focus.slick blur.slick","*",function(t){t.stopImmediatePropagation();var o=i(this);setTimeout(function(){e.options.pauseOnFocus&&(e.focussed=o.is(":focus"),e.autoPlay())},0)})},e.prototype.getCurrent=e.prototype.slickCurrentSlide=function(){return this.currentSlide},e.prototype.getDotCount=function(){var i=this,e=0,t=0,o=0;if(!0===i.options.infinite)if(i.slideCount<=i.options.slidesToShow)++o;else for(;e<i.slideCount;)++o,e=t+i.options.slidesToScroll,t+=i.options.slidesToScroll<=i.options.slidesToShow?i.options.slidesToScroll:i.options.slidesToShow;else if(!0===i.options.centerMode)o=i.slideCount;else if(i.options.asNavFor)for(;e<i.slideCount;)++o,e=t+i.options.slidesToScroll,t+=i.options.slidesToScroll<=i.options.slidesToShow?i.options.slidesToScroll:i.options.slidesToShow;else o=1+Math.ceil((i.slideCount-i.options.slidesToShow)/i.options.slidesToScroll);return o-1},e.prototype.getLeft=function(i){var e,t,o,s,n=this,r=0;return n.slideOffset=0,t=n.$slides.first().outerHeight(!0),!0===n.options.infinite?(n.slideCount>n.options.slidesToShow&&(n.slideOffset=n.slideWidth*n.options.slidesToShow*-1,s=-1,!0===n.options.vertical&&!0===n.options.centerMode&&(2===n.options.slidesToShow?s=-1.5:1===n.options.slidesToShow&&(s=-2)),r=t*n.options.slidesToShow*s),n.slideCount%n.options.slidesToScroll!=0&&i+n.options.slidesToScroll>n.slideCount&&n.slideCount>n.options.slidesToShow&&(i>n.slideCount?(n.slideOffset=(n.options.slidesToShow-(i-n.slideCount))*n.slideWidth*-1,r=(n.options.slidesToShow-(i-n.slideCount))*t*-1):(n.slideOffset=n.slideCount%n.options.slidesToScroll*n.slideWidth*-1,r=n.slideCount%n.options.slidesToScroll*t*-1))):i+n.options.slidesToShow>n.slideCount&&(n.slideOffset=(i+n.options.slidesToShow-n.slideCount)*n.slideWidth,r=(i+n.options.slidesToShow-n.slideCount)*t),n.slideCount<=n.options.slidesToShow&&(n.slideOffset=0,r=0),!0===n.options.centerMode&&n.slideCount<=n.options.slidesToShow?n.slideOffset=n.slideWidth*Math.floor(n.options.slidesToShow)/2-n.slideWidth*n.slideCount/2:!0===n.options.centerMode&&!0===n.options.infinite?n.slideOffset+=n.slideWidth*Math.floor(n.options.slidesToShow/2)-n.slideWidth:!0===n.options.centerMode&&(n.slideOffset=0,n.slideOffset+=n.slideWidth*Math.floor(n.options.slidesToShow/2)),e=!1===n.options.vertical?i*n.slideWidth*-1+n.slideOffset:i*t*-1+r,!0===n.options.variableWidth&&(o=n.slideCount<=n.options.slidesToShow||!1===n.options.infinite?n.$slideTrack.children(".slick-slide").eq(i):n.$slideTrack.children(".slick-slide").eq(i+n.options.slidesToShow),e=!0===n.options.rtl?o[0]?-1*(n.$slideTrack.width()-o[0].offsetLeft-o.width()):0:o[0]?-1*o[0].offsetLeft:0,!0===n.options.centerMode&&(o=n.slideCount<=n.options.slidesToShow||!1===n.options.infinite?n.$slideTrack.children(".slick-slide").eq(i):n.$slideTrack.children(".slick-slide").eq(i+n.options.slidesToShow+1),e=!0===n.options.rtl?o[0]?-1*(n.$slideTrack.width()-o[0].offsetLeft-o.width()):0:o[0]?-1*o[0].offsetLeft:0,e+=(n.$list.width()-o.outerWidth())/2)),e},e.prototype.getOption=e.prototype.slickGetOption=function(i){return this.options[i]},e.prototype.getNavigableIndexes=function(){var i,e=this,t=0,o=0,s=[];for(!1===e.options.infinite?i=e.slideCount:(t=-1*e.options.slidesToScroll,o=-1*e.options.slidesToScroll,i=2*e.slideCount);t<i;)s.push(t),t=o+e.options.slidesToScroll,o+=e.options.slidesToScroll<=e.options.slidesToShow?e.options.slidesToScroll:e.options.slidesToShow;return s},e.prototype.getSlick=function(){return this},e.prototype.getSlideCount=function(){var e,t,o=this;return t=!0===o.options.centerMode?o.slideWidth*Math.floor(o.options.slidesToShow/2):0,!0===o.options.swipeToSlide?(o.$slideTrack.find(".slick-slide").each(function(s,n){if(n.offsetLeft-t+i(n).outerWidth()/2>-1*o.swipeLeft)return e=n,!1}),Math.abs(i(e).attr("data-slick-index")-o.currentSlide)||1):o.options.slidesToScroll},e.prototype.goTo=e.prototype.slickGoTo=function(i,e){this.changeSlide({data:{message:"index",index:parseInt(i)}},e)},e.prototype.init=function(e){var t=this;i(t.$slider).hasClass("slick-initialized")||(i(t.$slider).addClass("slick-initialized"),t.buildRows(),t.buildOut(),t.setProps(),t.startLoad(),t.loadSlider(),t.initializeEvents(),t.updateArrows(),t.updateDots(),t.checkResponsive(!0),t.focusHandler()),e&&t.$slider.trigger("init",[t]),!0===t.options.accessibility&&t.initADA(),t.options.autoplay&&(t.paused=!1,t.autoPlay())},e.prototype.initADA=function(){var e=this,t=Math.ceil(e.slideCount/e.options.slidesToShow),o=e.getNavigableIndexes().filter(function(i){return i>=0&&i<e.slideCount});e.$slides.add(e.$slideTrack.find(".slick-cloned")).attr({"aria-hidden":"true",tabindex:"-1"}).find("a, input, button, select").attr({tabindex:"-1"}),null!==e.$dots&&(e.$slides.not(e.$slideTrack.find(".slick-cloned")).each(function(t){var s=o.indexOf(t);i(this).attr({role:"tabpanel",id:"slick-slide"+e.instanceUid+t,tabindex:-1}),-1!==s&&i(this).attr({"aria-describedby":"slick-slide-control"+e.instanceUid+s})}),e.$dots.attr("role","tablist").find("li").each(function(s){var n=o[s];i(this).attr({role:"presentation"}),i(this).find("button").first().attr({role:"tab",id:"slick-slide-control"+e.instanceUid+s,"aria-controls":"slick-slide"+e.instanceUid+n,"aria-label":s+1+" of "+t,"aria-selected":null,tabindex:"-1"})}).eq(e.currentSlide).find("button").attr({"aria-selected":"true",tabindex:"0"}).end());for(var s=e.currentSlide,n=s+e.options.slidesToShow;s<n;s++)e.$slides.eq(s).attr("tabindex",0);e.activateADA()},e.prototype.initArrowEvents=function(){var i=this;!0===i.options.arrows&&i.slideCount>i.options.slidesToShow&&(i.$prevArrow.off("click.slick").on("click.slick",{message:"previous"},i.changeSlide),i.$nextArrow.off("click.slick").on("click.slick",{message:"next"},i.changeSlide),!0===i.options.accessibility&&(i.$prevArrow.on("keydown.slick",i.keyHandler),i.$nextArrow.on("keydown.slick",i.keyHandler)))},e.prototype.initDotEvents=function(){var e=this;!0===e.options.dots&&(i("li",e.$dots).on("click.slick",{message:"index"},e.changeSlide),!0===e.options.accessibility&&e.$dots.on("keydown.slick",e.keyHandler)),!0===e.options.dots&&!0===e.options.pauseOnDotsHover&&i("li",e.$dots).on("mouseenter.slick",i.proxy(e.interrupt,e,!0)).on("mouseleave.slick",i.proxy(e.interrupt,e,!1))},e.prototype.initSlideEvents=function(){var e=this;e.options.pauseOnHover&&(e.$list.on("mouseenter.slick",i.proxy(e.interrupt,e,!0)),e.$list.on("mouseleave.slick",i.proxy(e.interrupt,e,!1)))},e.prototype.initializeEvents=function(){var e=this;e.initArrowEvents(),e.initDotEvents(),e.initSlideEvents(),e.$list.on("touchstart.slick mousedown.slick",{action:"start"},e.swipeHandler),e.$list.on("touchmove.slick mousemove.slick",{action:"move"},e.swipeHandler),e.$list.on("touchend.slick mouseup.slick",{action:"end"},e.swipeHandler),e.$list.on("touchcancel.slick mouseleave.slick",{action:"end"},e.swipeHandler),e.$list.on("click.slick",e.clickHandler),i(document).on(e.visibilityChange,i.proxy(e.visibility,e)),!0===e.options.accessibility&&e.$list.on("keydown.slick",e.keyHandler),!0===e.options.focusOnSelect&&i(e.$slideTrack).children().on("click.slick",e.selectHandler),i(window).on("orientationchange.slick.slick-"+e.instanceUid,i.proxy(e.orientationChange,e)),i(window).on("resize.slick.slick-"+e.instanceUid,i.proxy(e.resize,e)),i("[draggable!=true]",e.$slideTrack).on("dragstart",e.preventDefault),i(window).on("load.slick.slick-"+e.instanceUid,e.setPosition),i(e.setPosition)},e.prototype.initUI=function(){var i=this;!0===i.options.arrows&&i.slideCount>i.options.slidesToShow&&(i.$prevArrow.show(),i.$nextArrow.show()),!0===i.options.dots&&i.slideCount>i.options.slidesToShow&&i.$dots.show()},e.prototype.keyHandler=function(i){var e=this;i.target.tagName.match("TEXTAREA|INPUT|SELECT")||(37===i.keyCode&&!0===e.options.accessibility?e.changeSlide({data:{message:!0===e.options.rtl?"next":"previous"}}):39===i.keyCode&&!0===e.options.accessibility&&e.changeSlide({data:{message:!0===e.options.rtl?"previous":"next"}}))},e.prototype.lazyLoad=function(){function e(e){i("img[data-lazy]",e).each(function(){var e=i(this),t=i(this).attr("data-lazy"),o=i(this).attr("data-srcset"),s=i(this).attr("data-sizes")||n.$slider.attr("data-sizes"),r=document.createElement("img");r.onload=function(){e.animate({opacity:0},100,function(){o&&(e.attr("srcset",o),s&&e.attr("sizes",s)),e.attr("src",t).animate({opacity:1},200,function(){e.removeAttr("data-lazy data-srcset data-sizes").removeClass("slick-loading")}),n.$slider.trigger("lazyLoaded",[n,e,t])})},r.onerror=function(){e.removeAttr("data-lazy").removeClass("slick-loading").addClass("slick-lazyload-error"),n.$slider.trigger("lazyLoadError",[n,e,t])},r.src=t})}var t,o,s,n=this;if(!0===n.options.centerMode?!0===n.options.infinite?s=(o=n.currentSlide+(n.options.slidesToShow/2+1))+n.options.slidesToShow+2:(o=Math.max(0,n.currentSlide-(n.options.slidesToShow/2+1)),s=n.options.slidesToShow/2+1+2+n.currentSlide):(o=n.options.infinite?n.options.slidesToShow+n.currentSlide:n.currentSlide,s=Math.ceil(o+n.options.slidesToShow),!0===n.options.fade&&(o>0&&o--,s<=n.slideCount&&s++)),t=n.$slider.find(".slick-slide").slice(o,s),"anticipated"===n.options.lazyLoad)for(var r=o-1,l=s,d=n.$slider.find(".slick-slide"),a=0;a<n.options.slidesToScroll;a++)r<0&&(r=n.slideCount-1),t=(t=t.add(d.eq(r))).add(d.eq(l)),r--,l++;e(t),n.slideCount<=n.options.slidesToShow?e(n.$slider.find(".slick-slide")):n.currentSlide>=n.slideCount-n.options.slidesToShow?e(n.$slider.find(".slick-cloned").slice(0,n.options.slidesToShow)):0===n.currentSlide&&e(n.$slider.find(".slick-cloned").slice(-1*n.options.slidesToShow))},e.prototype.loadSlider=function(){var i=this;i.setPosition(),i.$slideTrack.css({opacity:1}),i.$slider.removeClass("slick-loading"),i.initUI(),"progressive"===i.options.lazyLoad&&i.progressiveLazyLoad()},e.prototype.next=e.prototype.slickNext=function(){this.changeSlide({data:{message:"next"}})},e.prototype.orientationChange=function(){var i=this;i.checkResponsive(),i.setPosition()},e.prototype.pause=e.prototype.slickPause=function(){var i=this;i.autoPlayClear(),i.paused=!0},e.prototype.play=e.prototype.slickPlay=function(){var i=this;i.autoPlay(),i.options.autoplay=!0,i.paused=!1,i.focussed=!1,i.interrupted=!1},e.prototype.postSlide=function(e){var t=this;t.unslicked||(t.$slider.trigger("afterChange",[t,e]),t.animating=!1,t.slideCount>t.options.slidesToShow&&t.setPosition(),t.swipeLeft=null,t.options.autoplay&&t.autoPlay(),!0===t.options.accessibility&&(t.initADA(),t.options.focusOnChange&&i(t.$slides.get(t.currentSlide)).attr("tabindex",0).focus()))},e.prototype.prev=e.prototype.slickPrev=function(){this.changeSlide({data:{message:"previous"}})},e.prototype.preventDefault=function(i){i.preventDefault()},e.prototype.progressiveLazyLoad=function(e){e=e||1;var t,o,s,n,r,l=this,d=i("img[data-lazy]",l.$slider);d.length?(t=d.first(),o=t.attr("data-lazy"),s=t.attr("data-srcset"),n=t.attr("data-sizes")||l.$slider.attr("data-sizes"),(r=document.createElement("img")).onload=function(){s&&(t.attr("srcset",s),n&&t.attr("sizes",n)),t.attr("src",o).removeAttr("data-lazy data-srcset data-sizes").removeClass("slick-loading"),!0===l.options.adaptiveHeight&&l.setPosition(),l.$slider.trigger("lazyLoaded",[l,t,o]),l.progressiveLazyLoad()},r.onerror=function(){e<3?setTimeout(function(){l.progressiveLazyLoad(e+1)},500):(t.removeAttr("data-lazy").removeClass("slick-loading").addClass("slick-lazyload-error"),l.$slider.trigger("lazyLoadError",[l,t,o]),l.progressiveLazyLoad())},r.src=o):l.$slider.trigger("allImagesLoaded",[l])},e.prototype.refresh=function(e){var t,o,s=this;o=s.slideCount-s.options.slidesToShow,!s.options.infinite&&s.currentSlide>o&&(s.currentSlide=o),s.slideCount<=s.options.slidesToShow&&(s.currentSlide=0),t=s.currentSlide,s.destroy(!0),i.extend(s,s.initials,{currentSlide:t}),s.init(),e||s.changeSlide({data:{message:"index",index:t}},!1)},e.prototype.registerBreakpoints=function(){var e,t,o,s=this,n=s.options.responsive||null;if("array"===i.type(n)&&n.length){s.respondTo=s.options.respondTo||"window";for(e in n)if(o=s.breakpoints.length-1,n.hasOwnProperty(e)){for(t=n[e].breakpoint;o>=0;)s.breakpoints[o]&&s.breakpoints[o]===t&&s.breakpoints.splice(o,1),o--;s.breakpoints.push(t),s.breakpointSettings[t]=n[e].settings}s.breakpoints.sort(function(i,e){return s.options.mobileFirst?i-e:e-i})}},e.prototype.reinit=function(){var e=this;e.$slides=e.$slideTrack.children(e.options.slide).addClass("slick-slide"),e.slideCount=e.$slides.length,e.currentSlide>=e.slideCount&&0!==e.currentSlide&&(e.currentSlide=e.currentSlide-e.options.slidesToScroll),e.slideCount<=e.options.slidesToShow&&(e.currentSlide=0),e.registerBreakpoints(),e.setProps(),e.setupInfinite(),e.buildArrows(),e.updateArrows(),e.initArrowEvents(),e.buildDots(),e.updateDots(),e.initDotEvents(),e.cleanUpSlideEvents(),e.initSlideEvents(),e.checkResponsive(!1,!0),!0===e.options.focusOnSelect&&i(e.$slideTrack).children().on("click.slick",e.selectHandler),e.setSlideClasses("number"==typeof e.currentSlide?e.currentSlide:0),e.setPosition(),e.focusHandler(),e.paused=!e.options.autoplay,e.autoPlay(),e.$slider.trigger("reInit",[e])},e.prototype.resize=function(){var e=this;i(window).width()!==e.windowWidth&&(clearTimeout(e.windowDelay),e.windowDelay=window.setTimeout(function(){e.windowWidth=i(window).width(),e.checkResponsive(),e.unslicked||e.setPosition()},50))},e.prototype.removeSlide=e.prototype.slickRemove=function(i,e,t){var o=this;if(i="boolean"==typeof i?!0===(e=i)?0:o.slideCount-1:!0===e?--i:i,o.slideCount<1||i<0||i>o.slideCount-1)return!1;o.unload(),!0===t?o.$slideTrack.children().remove():o.$slideTrack.children(this.options.slide).eq(i).remove(),o.$slides=o.$slideTrack.children(this.options.slide),o.$slideTrack.children(this.options.slide).detach(),o.$slideTrack.append(o.$slides),o.$slidesCache=o.$slides,o.reinit()},e.prototype.setCSS=function(i){var e,t,o=this,s={};!0===o.options.rtl&&(i=-i),e="left"==o.positionProp?Math.ceil(i)+"px":"0px",t="top"==o.positionProp?Math.ceil(i)+"px":"0px",s[o.positionProp]=i,!1===o.transformsEnabled?o.$slideTrack.css(s):(s={},!1===o.cssTransitions?(s[o.animType]="translate("+e+", "+t+")",o.$slideTrack.css(s)):(s[o.animType]="translate3d("+e+", "+t+", 0px)",o.$slideTrack.css(s)))},e.prototype.setDimensions=function(){var i=this;!1===i.options.vertical?!0===i.options.centerMode&&i.$list.css({padding:"0px "+i.options.centerPadding}):(i.$list.height(i.$slides.first().outerHeight(!0)*i.options.slidesToShow),!0===i.options.centerMode&&i.$list.css({padding:i.options.centerPadding+" 0px"})),i.listWidth=i.$list.width(),i.listHeight=i.$list.height(),!1===i.options.vertical&&!1===i.options.variableWidth?(i.slideWidth=Math.ceil(i.listWidth/i.options.slidesToShow),i.$slideTrack.width(Math.ceil(i.slideWidth*i.$slideTrack.children(".slick-slide").length))):!0===i.options.variableWidth?i.$slideTrack.width(5e3*i.slideCount):(i.slideWidth=Math.ceil(i.listWidth),i.$slideTrack.height(Math.ceil(i.$slides.first().outerHeight(!0)*i.$slideTrack.children(".slick-slide").length)));var e=i.$slides.first().outerWidth(!0)-i.$slides.first().width();!1===i.options.variableWidth&&i.$slideTrack.children(".slick-slide").width(i.slideWidth-e)},e.prototype.setFade=function(){var e,t=this;t.$slides.each(function(o,s){e=t.slideWidth*o*-1,!0===t.options.rtl?i(s).css({position:"relative",right:e,top:0,zIndex:t.options.zIndex-2,opacity:0}):i(s).css({position:"relative",left:e,top:0,zIndex:t.options.zIndex-2,opacity:0})}),t.$slides.eq(t.currentSlide).css({zIndex:t.options.zIndex-1,opacity:1})},e.prototype.setHeight=function(){var i=this;if(1===i.options.slidesToShow&&!0===i.options.adaptiveHeight&&!1===i.options.vertical){var e=i.$slides.eq(i.currentSlide).outerHeight(!0);i.$list.css("height",e)}},e.prototype.setOption=e.prototype.slickSetOption=function(){var e,t,o,s,n,r=this,l=!1;if("object"===i.type(arguments[0])?(o=arguments[0],l=arguments[1],n="multiple"):"string"===i.type(arguments[0])&&(o=arguments[0],s=arguments[1],l=arguments[2],"responsive"===arguments[0]&&"array"===i.type(arguments[1])?n="responsive":void 0!==arguments[1]&&(n="single")),"single"===n)r.options[o]=s;else if("multiple"===n)i.each(o,function(i,e){r.options[i]=e});else if("responsive"===n)for(t in s)if("array"!==i.type(r.options.responsive))r.options.responsive=[s[t]];else{for(e=r.options.responsive.length-1;e>=0;)r.options.responsive[e].breakpoint===s[t].breakpoint&&r.options.responsive.splice(e,1),e--;r.options.responsive.push(s[t])}l&&(r.unload(),r.reinit())},e.prototype.setPosition=function(){var i=this;i.setDimensions(),i.setHeight(),!1===i.options.fade?i.setCSS(i.getLeft(i.currentSlide)):i.setFade(),i.$slider.trigger("setPosition",[i])},e.prototype.setProps=function(){var i=this,e=document.body.style;i.positionProp=!0===i.options.vertical?"top":"left","top"===i.positionProp?i.$slider.addClass("slick-vertical"):i.$slider.removeClass("slick-vertical"),void 0===e.WebkitTransition&&void 0===e.MozTransition&&void 0===e.msTransition||!0===i.options.useCSS&&(i.cssTransitions=!0),i.options.fade&&("number"==typeof i.options.zIndex?i.options.zIndex<3&&(i.options.zIndex=3):i.options.zIndex=i.defaults.zIndex),void 0!==e.OTransform&&(i.animType="OTransform",i.transformType="-o-transform",i.transitionType="OTransition",void 0===e.perspectiveProperty&&void 0===e.webkitPerspective&&(i.animType=!1)),void 0!==e.MozTransform&&(i.animType="MozTransform",i.transformType="-moz-transform",i.transitionType="MozTransition",void 0===e.perspectiveProperty&&void 0===e.MozPerspective&&(i.animType=!1)),void 0!==e.webkitTransform&&(i.animType="webkitTransform",i.transformType="-webkit-transform",i.transitionType="webkitTransition",void 0===e.perspectiveProperty&&void 0===e.webkitPerspective&&(i.animType=!1)),void 0!==e.msTransform&&(i.animType="msTransform",i.transformType="-ms-transform",i.transitionType="msTransition",void 0===e.msTransform&&(i.animType=!1)),void 0!==e.transform&&!1!==i.animType&&(i.animType="transform",i.transformType="transform",i.transitionType="transition"),i.transformsEnabled=i.options.useTransform&&null!==i.animType&&!1!==i.animType},e.prototype.setSlideClasses=function(i){var e,t,o,s,n=this;if(t=n.$slider.find(".slick-slide").removeClass("slick-active slick-center slick-current").attr("aria-hidden","true"),n.$slides.eq(i).addClass("slick-current"),!0===n.options.centerMode){var r=n.options.slidesToShow%2==0?1:0;e=Math.floor(n.options.slidesToShow/2),!0===n.options.infinite&&(i>=e&&i<=n.slideCount-1-e?n.$slides.slice(i-e+r,i+e+1).addClass("slick-active").attr("aria-hidden","false"):(o=n.options.slidesToShow+i,t.slice(o-e+1+r,o+e+2).addClass("slick-active").attr("aria-hidden","false")),0===i?t.eq(t.length-1-n.options.slidesToShow).addClass("slick-center"):i===n.slideCount-1&&t.eq(n.options.slidesToShow).addClass("slick-center")),n.$slides.eq(i).addClass("slick-center")}else i>=0&&i<=n.slideCount-n.options.slidesToShow?n.$slides.slice(i,i+n.options.slidesToShow).addClass("slick-active").attr("aria-hidden","false"):t.length<=n.options.slidesToShow?t.addClass("slick-active").attr("aria-hidden","false"):(s=n.slideCount%n.options.slidesToShow,o=!0===n.options.infinite?n.options.slidesToShow+i:i,n.options.slidesToShow==n.options.slidesToScroll&&n.slideCount-i<n.options.slidesToShow?t.slice(o-(n.options.slidesToShow-s),o+s).addClass("slick-active").attr("aria-hidden","false"):t.slice(o,o+n.options.slidesToShow).addClass("slick-active").attr("aria-hidden","false"));"ondemand"!==n.options.lazyLoad&&"anticipated"!==n.options.lazyLoad||n.lazyLoad()},e.prototype.setupInfinite=function(){var e,t,o,s=this;if(!0===s.options.fade&&(s.options.centerMode=!1),!0===s.options.infinite&&!1===s.options.fade&&(t=null,s.slideCount>s.options.slidesToShow)){for(o=!0===s.options.centerMode?s.options.slidesToShow+1:s.options.slidesToShow,e=s.slideCount;e>s.slideCount-o;e-=1)t=e-1,i(s.$slides[t]).clone(!0).attr("id","").attr("data-slick-index",t-s.slideCount).prependTo(s.$slideTrack).addClass("slick-cloned");for(e=0;e<o+s.slideCount;e+=1)t=e,i(s.$slides[t]).clone(!0).attr("id","").attr("data-slick-index",t+s.slideCount).appendTo(s.$slideTrack).addClass("slick-cloned");s.$slideTrack.find(".slick-cloned").find("[id]").each(function(){i(this).attr("id","")})}},e.prototype.interrupt=function(i){var e=this;i||e.autoPlay(),e.interrupted=i},e.prototype.selectHandler=function(e){var t=this,o=i(e.target).is(".slick-slide")?i(e.target):i(e.target).parents(".slick-slide"),s=parseInt(o.attr("data-slick-index"));s||(s=0),t.slideCount<=t.options.slidesToShow?t.slideHandler(s,!1,!0):t.slideHandler(s)},e.prototype.slideHandler=function(i,e,t){var o,s,n,r,l,d=null,a=this;if(e=e||!1,!(!0===a.animating&&!0===a.options.waitForAnimate||!0===a.options.fade&&a.currentSlide===i))if(!1===e&&a.asNavFor(i),o=i,d=a.getLeft(o),r=a.getLeft(a.currentSlide),a.currentLeft=null===a.swipeLeft?r:a.swipeLeft,!1===a.options.infinite&&!1===a.options.centerMode&&(i<0||i>a.getDotCount()*a.options.slidesToScroll))!1===a.options.fade&&(o=a.currentSlide,!0!==t?a.animateSlide(r,function(){a.postSlide(o)}):a.postSlide(o));else if(!1===a.options.infinite&&!0===a.options.centerMode&&(i<0||i>a.slideCount-a.options.slidesToScroll))!1===a.options.fade&&(o=a.currentSlide,!0!==t?a.animateSlide(r,function(){a.postSlide(o)}):a.postSlide(o));else{if(a.options.autoplay&&clearInterval(a.autoPlayTimer),s=o<0?a.slideCount%a.options.slidesToScroll!=0?a.slideCount-a.slideCount%a.options.slidesToScroll:a.slideCount+o:o>=a.slideCount?a.slideCount%a.options.slidesToScroll!=0?0:o-a.slideCount:o,a.animating=!0,a.$slider.trigger("beforeChange",[a,a.currentSlide,s]),n=a.currentSlide,a.currentSlide=s,a.setSlideClasses(a.currentSlide),a.options.asNavFor&&(l=(l=a.getNavTarget()).slick("getSlick")).slideCount<=l.options.slidesToShow&&l.setSlideClasses(a.currentSlide),a.updateDots(),a.updateArrows(),!0===a.options.fade)return!0!==t?(a.fadeSlideOut(n),a.fadeSlide(s,function(){a.postSlide(s)})):a.postSlide(s),void a.animateHeight();!0!==t?a.animateSlide(d,function(){a.postSlide(s)}):a.postSlide(s)}},e.prototype.startLoad=function(){var i=this;!0===i.options.arrows&&i.slideCount>i.options.slidesToShow&&(i.$prevArrow.hide(),i.$nextArrow.hide()),!0===i.options.dots&&i.slideCount>i.options.slidesToShow&&i.$dots.hide(),i.$slider.addClass("slick-loading")},e.prototype.swipeDirection=function(){var i,e,t,o,s=this;return i=s.touchObject.startX-s.touchObject.curX,e=s.touchObject.startY-s.touchObject.curY,t=Math.atan2(e,i),(o=Math.round(180*t/Math.PI))<0&&(o=360-Math.abs(o)),o<=45&&o>=0?!1===s.options.rtl?"left":"right":o<=360&&o>=315?!1===s.options.rtl?"left":"right":o>=135&&o<=225?!1===s.options.rtl?"right":"left":!0===s.options.verticalSwiping?o>=35&&o<=135?"down":"up":"vertical"},e.prototype.swipeEnd=function(i){var e,t,o=this;if(o.dragging=!1,o.swiping=!1,o.scrolling)return o.scrolling=!1,!1;if(o.interrupted=!1,o.shouldClick=!(o.touchObject.swipeLength>10),void 0===o.touchObject.curX)return!1;if(!0===o.touchObject.edgeHit&&o.$slider.trigger("edge",[o,o.swipeDirection()]),o.touchObject.swipeLength>=o.touchObject.minSwipe){switch(t=o.swipeDirection()){case"left":case"down":e=o.options.swipeToSlide?o.checkNavigable(o.currentSlide+o.getSlideCount()):o.currentSlide+o.getSlideCount(),o.currentDirection=0;break;case"right":case"up":e=o.options.swipeToSlide?o.checkNavigable(o.currentSlide-o.getSlideCount()):o.currentSlide-o.getSlideCount(),o.currentDirection=1}"vertical"!=t&&(o.slideHandler(e),o.touchObject={},o.$slider.trigger("swipe",[o,t]))}else o.touchObject.startX!==o.touchObject.curX&&(o.slideHandler(o.currentSlide),o.touchObject={})},e.prototype.swipeHandler=function(i){var e=this;if(!(!1===e.options.swipe||"ontouchend"in document&&!1===e.options.swipe||!1===e.options.draggable&&-1!==i.type.indexOf("mouse")))switch(e.touchObject.fingerCount=i.originalEvent&&void 0!==i.originalEvent.touches?i.originalEvent.touches.length:1,e.touchObject.minSwipe=e.listWidth/e.options.touchThreshold,!0===e.options.verticalSwiping&&(e.touchObject.minSwipe=e.listHeight/e.options.touchThreshold),i.data.action){case"start":e.swipeStart(i);break;case"move":e.swipeMove(i);break;case"end":e.swipeEnd(i)}},e.prototype.swipeMove=function(i){var e,t,o,s,n,r,l=this;return n=void 0!==i.originalEvent?i.originalEvent.touches:null,!(!l.dragging||l.scrolling||n&&1!==n.length)&&(e=l.getLeft(l.currentSlide),l.touchObject.curX=void 0!==n?n[0].pageX:i.clientX,l.touchObject.curY=void 0!==n?n[0].pageY:i.clientY,l.touchObject.swipeLength=Math.round(Math.sqrt(Math.pow(l.touchObject.curX-l.touchObject.startX,2))),r=Math.round(Math.sqrt(Math.pow(l.touchObject.curY-l.touchObject.startY,2))),!l.options.verticalSwiping&&!l.swiping&&r>4?(l.scrolling=!0,!1):(!0===l.options.verticalSwiping&&(l.touchObject.swipeLength=r),t=l.swipeDirection(),void 0!==i.originalEvent&&l.touchObject.swipeLength>4&&(l.swiping=!0,i.preventDefault()),s=(!1===l.options.rtl?1:-1)*(l.touchObject.curX>l.touchObject.startX?1:-1),!0===l.options.verticalSwiping&&(s=l.touchObject.curY>l.touchObject.startY?1:-1),o=l.touchObject.swipeLength,l.touchObject.edgeHit=!1,!1===l.options.infinite&&(0===l.currentSlide&&"right"===t||l.currentSlide>=l.getDotCount()&&"left"===t)&&(o=l.touchObject.swipeLength*l.options.edgeFriction,l.touchObject.edgeHit=!0),!1===l.options.vertical?l.swipeLeft=e+o*s:l.swipeLeft=e+o*(l.$list.height()/l.listWidth)*s,!0===l.options.verticalSwiping&&(l.swipeLeft=e+o*s),!0!==l.options.fade&&!1!==l.options.touchMove&&(!0===l.animating?(l.swipeLeft=null,!1):void l.setCSS(l.swipeLeft))))},e.prototype.swipeStart=function(i){var e,t=this;if(t.interrupted=!0,1!==t.touchObject.fingerCount||t.slideCount<=t.options.slidesToShow)return t.touchObject={},!1;void 0!==i.originalEvent&&void 0!==i.originalEvent.touches&&(e=i.originalEvent.touches[0]),t.touchObject.startX=t.touchObject.curX=void 0!==e?e.pageX:i.clientX,t.touchObject.startY=t.touchObject.curY=void 0!==e?e.pageY:i.clientY,t.dragging=!0},e.prototype.unfilterSlides=e.prototype.slickUnfilter=function(){var i=this;null!==i.$slidesCache&&(i.unload(),i.$slideTrack.children(this.options.slide).detach(),i.$slidesCache.appendTo(i.$slideTrack),i.reinit())},e.prototype.unload=function(){var e=this;i(".slick-cloned",e.$slider).remove(),e.$dots&&e.$dots.remove(),e.$prevArrow&&e.htmlExpr.test(e.options.prevArrow)&&e.$prevArrow.remove(),e.$nextArrow&&e.htmlExpr.test(e.options.nextArrow)&&e.$nextArrow.remove(),e.$slides.removeClass("slick-slide slick-active slick-visible slick-current").attr("aria-hidden","true").css("width","")},e.prototype.unslick=function(i){var e=this;e.$slider.trigger("unslick",[e,i]),e.destroy()},e.prototype.updateArrows=function(){var i=this;Math.floor(i.options.slidesToShow/2),!0===i.options.arrows&&i.slideCount>i.options.slidesToShow&&!i.options.infinite&&(i.$prevArrow.removeClass("slick-disabled").attr("aria-disabled","false"),i.$nextArrow.removeClass("slick-disabled").attr("aria-disabled","false"),0===i.currentSlide?(i.$prevArrow.addClass("slick-disabled").attr("aria-disabled","true"),i.$nextArrow.removeClass("slick-disabled").attr("aria-disabled","false")):i.currentSlide>=i.slideCount-i.options.slidesToShow&&!1===i.options.centerMode?(i.$nextArrow.addClass("slick-disabled").attr("aria-disabled","true"),i.$prevArrow.removeClass("slick-disabled").attr("aria-disabled","false")):i.currentSlide>=i.slideCount-1&&!0===i.options.centerMode&&(i.$nextArrow.addClass("slick-disabled").attr("aria-disabled","true"),i.$prevArrow.removeClass("slick-disabled").attr("aria-disabled","false")))},e.prototype.updateDots=function(){var i=this;null!==i.$dots&&(i.$dots.find("li").removeClass("slick-active").end(),i.$dots.find("li").eq(Math.floor(i.currentSlide/i.options.slidesToScroll)).addClass("slick-active"))},e.prototype.visibility=function(){var i=this;i.options.autoplay&&(document[i.hidden]?i.interrupted=!0:i.interrupted=!1)},i.fn.slick=function(){var i,t,o=this,s=arguments[0],n=Array.prototype.slice.call(arguments,1),r=o.length;for(i=0;i<r;i++)if("object"==typeof s||void 0===s?o[i].slick=new e(o[i],s):t=o[i].slick[s].apply(o[i].slick,n),void 0!==t)return t;return o}});</script>
+
+    <div class="product_customer_reviews" style="background-color:{{ block.settings.back_color }};color:{{ block.settings.text_color }};">
+    <div class="wrapper">
+
+      {% if block.settings.title != blank %}
+      <h2>{{ block.settings.title }}</h2>
+    {% endif %}
+
+    {% if section.blocks.size > 0 %}
+    <div class="reviews_carousel_slider">
+      {% for i in (1..15) %}
+      {% capture enable %}enable_{{i}}{% endcapture %}
+    {% capture image %}image_{{i}}{% endcapture %}
+
+    {% if block.settings[enable] != blank  %}
+    <div class="inner_reviews_carousel">
+
+      <div class="image">
+        {% if block.settings[image] != blank %}
+        <img class="lazyload" data-src="{{ block.settings[image] | img_url: 'large' }}" width="{{ block.settings[image].width }}" height="{{ block.settings[image].height }}" style="height:auto">
+        {% else %}
+        {{ 'image' | placeholder_svg_tag }}
+        {% endif %}
+    </div>
+
+    </div>
+        {% endif %}
+
+
+        {% endfor %}
+    </div>
+        {% endif %}
+
+
+    </div>
+    </div>
+
+        <script>
+
+          $(document).ready(function(){ 
+
+          if($(window).width() < 701){
+            $('.reviews_carousel_slider').not('.slick-initialized').slick({
+              infinite: true,
+              slidesToShow: 1,
+              slidesToScroll: 1,
+              dots: true,
+              adaptiveHeight: true,
+              prevArrow:'<button type="button" class="slick-prev"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 33"><g id="7f9a1925-e8c7-4614-8787-3c6095a9f6e1" data-name="Layer 2"><g id="c9b7920a-81fa-4bfe-ad13-4da717c6854b" data-name="Layer 1"><g id="c2d982ff-0cf6-4220-b365-47f30d708fea" data-name="e4eb89a6-f885-43b8-9259-0d6b1516fab0"><g id="f51d455e-6b9c-4c4e-96db-a5004582beda" data-name="8e584754-6657-46f1-a9d8-2cfd6623b552"><polygon points="0 16.5 2.1 18.5 17 33 17 29.3 5.9 18.5 3.8 16.5 5.9 14.5 17 3.7 17 0 2.1 14.5 0 16.5"></polygon></g></g></g></g></svg></button>',
+              nextArrow:'<button type="button" class="slick-next"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 17 33" xml:space="preserve"><g id="e4eb89a6-f885-43b8-9259-0d6b1516fab0"><g id="_x38_e584754-6657-46f1-a9d8-2cfd6623b552"><g><polygon points="14.9,14.5 0,0 0,3.7 11.1,14.5 13.2,16.5 11.1,18.5 0,29.3 0,33 14.9,18.5 17,16.5 "></polygon></g></g></g></svg></button>'
+            });
+          }
+
+          if($(window).width() > 700 && $(window).width() <= 991){
+            $('.reviews_carousel_slider').not('.slick-initialized').slick({
+              infinite: true,
+              slidesToShow: 2,
+              slidesToScroll: 2,
+              dots: true,
+              prevArrow:'<button type="button" class="slick-prev"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 33"><g id="7f9a1925-e8c7-4614-8787-3c6095a9f6e1" data-name="Layer 2"><g id="c9b7920a-81fa-4bfe-ad13-4da717c6854b" data-name="Layer 1"><g id="c2d982ff-0cf6-4220-b365-47f30d708fea" data-name="e4eb89a6-f885-43b8-9259-0d6b1516fab0"><g id="f51d455e-6b9c-4c4e-96db-a5004582beda" data-name="8e584754-6657-46f1-a9d8-2cfd6623b552"><polygon points="0 16.5 2.1 18.5 17 33 17 29.3 5.9 18.5 3.8 16.5 5.9 14.5 17 3.7 17 0 2.1 14.5 0 16.5"></polygon></g></g></g></g></svg></button>',
+              nextArrow:'<button type="button" class="slick-next"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 17 33" xml:space="preserve"><g id="e4eb89a6-f885-43b8-9259-0d6b1516fab0"><g id="_x38_e584754-6657-46f1-a9d8-2cfd6623b552"><g><polygon points="14.9,14.5 0,0 0,3.7 11.1,14.5 13.2,16.5 11.1,18.5 0,29.3 0,33 14.9,18.5 17,16.5 "></polygon></g></g></g></svg></button>'
+
+            });
+          }
+
+          if($(window).width() >= 992){
+            $('.reviews_carousel_slider').not('.slick-initialized').slick({
+              infinite: true,
+              slidesToShow: 3,
+              slidesToScroll: 3,
+              dots: true,
+              prevArrow:'<button type="button" class="slick-prev"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 33"><g id="7f9a1925-e8c7-4614-8787-3c6095a9f6e1" data-name="Layer 2"><g id="c9b7920a-81fa-4bfe-ad13-4da717c6854b" data-name="Layer 1"><g id="c2d982ff-0cf6-4220-b365-47f30d708fea" data-name="e4eb89a6-f885-43b8-9259-0d6b1516fab0"><g id="f51d455e-6b9c-4c4e-96db-a5004582beda" data-name="8e584754-6657-46f1-a9d8-2cfd6623b552"><polygon points="0 16.5 2.1 18.5 17 33 17 29.3 5.9 18.5 3.8 16.5 5.9 14.5 17 3.7 17 0 2.1 14.5 0 16.5"></polygon></g></g></g></g></svg></button>',
+              nextArrow:'<button type="button" class="slick-next"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 17 33" xml:space="preserve"><g id="e4eb89a6-f885-43b8-9259-0d6b1516fab0"><g id="_x38_e584754-6657-46f1-a9d8-2cfd6623b552"><g><polygon points="14.9,14.5 0,0 0,3.7 11.1,14.5 13.2,16.5 11.1,18.5 0,29.3 0,33 14.9,18.5 17,16.5 "></polygon></g></g></g></svg></button>'
+
+            });
+          }
+
+        });
+
+
+  </script>
+  {% endif %}
+
+  {% if block.type == 'shipping-policy' %}
+  <div class="product_shipping_policy_block" style="background-color:{{ block.settings.back_color }};color:{{ block.settings.text_color }};">
+    <div class="wrapper">
+
+      <div class="inner_shipping_blocks">
+
+        <div class="First_row_inner clearfix">
+
+          {% if block.settings.image_1 != blank or block.settings.heading_1 != blank or block.settings.text_1 != blank %}
+          <div class="block_left_part common_block_part">
+
+            {% if block.settings.image_1 != blank or block.settings.heading_1 != blank %}
+            <div class="coverd_icon_heading clearfix">
+              {% if block.settings.image_1 != blank %}
+              <div class="icon_img">
+                <img src="{{ block.settings.image_1 | img_url : 'medium' }}">
+              </div>
+              {% endif %}
+
+              {% if block.settings.heading_1 != blank %}
+              <div class="inn_heading">
+                {{ block.settings.heading_1 }}
+              </div>
+              {% endif %}
+
+            </div>
+            {% endif %}
+
+            {% if block.settings.text_1 != blank %}
+            <div class="richtext">
+              {{ block.settings.text_1 }}
+            </div>
+            {% endif %}
+
+          </div>
+          {% endif %}
+
+          {% if block.settings.image_2 != blank or block.settings.heading_2 != blank or block.settings.text_2 != blank %}
+          <div class="block_right_part common_block_part">
+
+            {% if block.settings.image_2 != blank or block.settings.heading_2 != blank %}
+            <div class="coverd_icon_heading clearfix">
+              {% if block.settings.image_2 != blank %}
+              <div class="icon_img">
+                <img src="{{ block.settings.image_2 | img_url : 'medium' }}">
+              </div>
+              {% endif %}
+
+              {% if block.settings.heading_2 != blank %}
+              <div class="inn_heading">
+                {{ block.settings.heading_2 }}
+              </div>
+              {% endif %}
+
+            </div>
+            {% endif %}
+
+            {% if block.settings.text_2 != blank %}
+            <div class="richtext">
+              {{ block.settings.text_2 }}
+            </div>
+            {% endif %}
+
+          </div>
+          {% endif %}
+
+        </div>
+
+        <div class="Second_row_inner">
+          {% if block.settings.image_3 != blank or block.settings.heading_3 != blank or block.settings.text_3 != blank %}
+          <div class="common_block_part full_block_part">
+
+            {% if block.settings.image_3 != blank or block.settings.heading_3 != blank %}
+            <div class="coverd_icon_heading clearfix">
+              {% if block.settings.image_3 != blank %}
+              <div class="icon_img">
+                <img src="{{ block.settings.image_3 | img_url : 'medium' }}">
+              </div>
+              {% endif %}
+
+              {% if block.settings.heading_3 != blank %}
+              <div class="inn_heading">
+                {{ block.settings.heading_3 }}
+              </div>
+              {% endif %}
+
+            </div>
+            {% endif %}
+
+            {% if block.settings.text_3 != blank %}
+            <div class="richtext">
+              {{ block.settings.text_3 }}
+            </div>
+            {% endif %}
+
+          </div>
+          {% endif %}
+
+
+          <div class="last_two_block clearfix">
+            {% if block.settings.heading_4 != blank or block.settings.text_4 != blank %}
+            <div class="block_left_part common_block_part">
+
+              {% if block.settings.heading_4 != blank %}
+              <div class="inn_heading">
+                {{ block.settings.heading_4 }}
+              </div>
+              {% endif %}
+
+              {% if block.settings.text_4 != blank %}
+              <div class="richtext">
+                {{ block.settings.text_4 }}
+              </div>
+              {% endif %}
+
+            </div>
+            {% endif %}
+
+            {% if block.settings.heading_5 != blank or block.settings.text_5 != blank %}
+            <div class="block_right_part common_block_part">
+
+              {% if block.settings.heading_5 != blank %}
+              <div class="inn_heading">
+                {{ block.settings.heading_5 }}
+              </div>
+              {% endif %}
+
+
+              {% if block.settings.text_5 != blank %}
+              <div class="richtext">
+                {{ block.settings.text_5 }}
+              </div>
+              {% endif %}
+
+            </div>
+            {% endif %}
+
+          </div>
+
+        </div>
+
+
+        {% if block.settings.bottom_text != blank %}
+        <div class="bottom_shipping_text text-center">
+          {{ block.settings.bottom_text }}
+        </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+  {% endif %}
+
+
+
+  {% if block.type == 'divider' %}
+  <div class="product_divider" style="display: inline-block;width: 100%;"></div>
+
+  {% style %}
+  .product_divider{
+  margin:{{ block.settings.divider }}px 0;
+  }
+  @media only screen and (max-width: 767px){
+  .product_divider{
+  margin:{{ block.settings.divider | minus: 20 }}px 0;
+  }
+  }
+  {% endstyle %}
+
+  {% endif %}
+
+     {% if block.type == 'three_columns_content' %}
+         <div class="product_two_columns_img_w_text three_columns_content" style="{% if block.settings.back_img != blank %}background-image: url({{ block.settings.back_img | img_url: 'master' }});{% else %}background-color:{{ block.settings.back_color }};{% endif %}color:{{ block.settings.text_color }};">
+    <div class="wrapper">
+
+      <div class="top_content text-center">
+       <div class="top_content_inner">
+        {% if block.settings.title != blank %}
+        <h2 class="heading" style="color:{{block.settings.heading_color}};">{{ block.settings.title }}</h2>
+        {% endif %}
+
+       {% if block.settings.subheading != blank %}
+          <p class="shbheading">{{ block.settings.subheading }}</p>
+         {% endif %}
+       </div>
+      </div>
+       
+        {% if block.settings.richtext != blank %}
+        <div class="page__content text-left">
+          {{ block.settings.richtext }}
+        </div>
+        {% endif %}
+
+       <div class="columns_header">
+<svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="25" cy="25" r="25" fill="#C9A15B"/>
+<path d="M34.4338 28.8086C32.0011 28.8086 30.022 30.7877 30.022 33.2204C30.022 35.6531 32.0011 37.6321 34.4338 37.6321C36.8669 37.6321 38.8456 35.6531 38.8456 33.2204C38.8456 30.7877 36.8665 28.8086 34.4338 28.8086ZM34.4338 35.4263C33.2173 35.4263 32.2279 34.4369 32.2279 33.2204C32.2279 32.0038 33.2173 31.0145 34.4338 31.0145C35.6503 31.0145 36.6397 32.0038 36.6397 33.2204C36.6397 34.437 35.6503 35.4263 34.4338 35.4263Z" fill="black"/>
+<path d="M19.3603 28.8086C16.9276 28.8086 14.9485 30.7877 14.9485 33.2204C14.9485 35.6531 16.9276 37.6321 19.3603 37.6321C21.793 37.6321 23.7721 35.6531 23.7721 33.2204C23.7721 30.7877 21.793 28.8086 19.3603 28.8086ZM19.3603 35.4263C18.1438 35.4263 17.1544 34.4369 17.1544 33.2204C17.1544 32.0038 18.1438 31.0145 19.3603 31.0145C20.5765 31.0145 21.5662 32.0038 21.5662 33.2204C21.5662 34.437 20.5768 35.4263 19.3603 35.4263Z" fill="black"/>
+<path d="M37.4048 16.1811C37.2173 15.8087 36.836 15.5737 36.4191 15.5737H30.6103V17.7796H35.7389L38.7422 23.7531L40.7136 22.7619L37.4048 16.1811Z" fill="black"/>
+<path d="M31.125 32.1543H22.7794V34.3602H31.125V32.1543Z" fill="black"/>
+<path d="M16.0514 32.1543H12.228C11.6187 32.1543 11.125 32.6481 11.125 33.2572C11.125 33.8664 11.6188 34.3601 12.228 34.3601H16.0515C16.6607 34.3601 17.1544 33.8664 17.1544 33.2572C17.1544 32.648 16.6607 32.1543 16.0514 32.1543Z" fill="black"/>
+<path d="M42.7684 25.4118L40.5989 22.6177C40.3905 22.3485 40.0688 22.1912 39.728 22.1912H31.7132V14.4706C31.7132 13.8614 31.2195 13.3677 30.6103 13.3677H12.228C11.6187 13.3677 11.125 13.8614 11.125 14.4706C11.125 15.0797 11.6188 15.5735 12.228 15.5735H29.5074V23.2941C29.5074 23.9033 30.0011 24.397 30.6103 24.397H39.1879L40.7941 26.4661V32.1543H37.7426C37.1334 32.1543 36.6397 32.6481 36.6397 33.2572C36.6397 33.8665 37.1335 34.3602 37.7426 34.3602H41.897C42.5062 34.3602 42.9999 33.8664 43 33.2572V26.0883C43 25.8434 42.9184 25.6052 42.7684 25.4118Z" fill="black"/>
+<path d="M15.978 26.5664H10.9044C10.2952 26.5664 9.80148 27.0602 9.80148 27.6693C9.80148 28.2785 10.2952 28.7722 10.9044 28.7722H15.9779C16.5871 28.7722 17.0808 28.2785 17.0808 27.6693C17.0809 27.0602 16.5871 26.5664 15.978 26.5664Z" fill="black"/>
+<path d="M18.5147 22.228H9.10291C8.49376 22.228 8 22.7218 8 23.331C8 23.9402 8.49376 24.4339 9.10291 24.4339H18.5147C19.1239 24.4339 19.6176 23.9402 19.6176 23.331C19.6176 22.7219 19.1239 22.228 18.5147 22.228Z" fill="black"/>
+<path d="M20.3162 17.8896H10.9044C10.2952 17.8896 9.80148 18.3834 9.80148 18.9926C9.80148 19.6018 10.2952 20.0955 10.9044 20.0955H20.3162C20.9254 20.0955 21.4191 19.6017 21.4191 18.9926C21.4192 18.3834 20.9254 17.8896 20.3162 17.8896Z" fill="black"/>
+</svg>
+
+
+        {% if block.settings.columns_title != blank %}
+        <p class="heading" style="color:{{block.settings.heading_color}};">{{ block.settings.columns_title }}</p>
+        {% endif %}
+       </div>
+
+      <div class="coverd_column_all_content clearfix">
+        {% for i in (1..3) %}
+        {% capture enable %}enable_{{i}}{% endcapture %}
+        {% capture image %}image_{{i}}{% endcapture %}
+        {% capture custom_html %}custom_html_{{i}}{% endcapture %}
+           {% capture label %}label_{{i}}{% endcapture %}
+          {% capture discount %}discount_{{i}}{% endcapture %}
+          {% capture button_text %}button_text_{{ i }}{% endcapture %}
+        
+        {% if block.settings[enable] != blank  %}
+        <div class="inner_column_repeated">
+          
+<div class="inner_column_wrapper">
+<div class="inner_column_content">
+          {% if block.settings[discount] != blank  %}
+          <div class="discount_circle">
+          <div class="discount_circle_inner">
+              <span class="discount_text">{{ block.settings[discount] }}</span>
+          </div>      
+          </div>
+          {% endif %}
+          
+                      {% if block.settings[label] != blank  %}
+    <div class="label_sale">{{ block.settings[label] }}</div>
+    {% endif %}
+          
+          <div class="inner__column">
+            <div class="image">
+              {% if block.settings[image] != blank %}
+              <img class="lazyload" data-src="{{ block.settings[image] | img_url: 'original' }}" width="{{ block.settings[image].width }}" height="{{ block.settings[image].height }}" style="height:auto">
+              {% else %}
+              {{ 'image' | placeholder_svg_tag }}
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="inner__column">
+            {% if block.settings[custom_html] != blank %}
+            <div class="inner__column_html">
+              <div style="color:{{block.settings.heading_color}};">{{ block.settings[custom_html] }}</div>
+               {% if block.settings[button_text] != blank %}
+              <div class="bf_buynow_btn">
+                  <a href="javascript:void(0);" class="btn btn--full btn--large" data-index="get_{{ forloop.index }}" style="    border-radius: 5px;">{{ block.settings[button_text] }}</a>
+              </div>
+                {% endif %}
+            </div>
+            {% endif %}
+          </div>        
+
+</div>
+</div>
+        </div>
+        {% endif %}
+
+        {% endfor %}
+
+      </div>
+
+  <div class="bottom_content text-center">
+        {% if block.settings.bottom_heading != blank %}
+        <p class="bottom_heading" style="color:{{block.settings.heading_color}};">{{ block.settings.bottom_heading }}</h2>
+        {% endif %}
+
+        {% if block.settings.bottom_text != blank %}
+        <div class="bottom_text">
+          {{ block.settings.bottom_text }}
+        </div>
+        {% endif %}
+
+       {% if block.settings.bottom_btn != blank %}
+            <div class="bottom_btn">
+          <a  href="javascript:void(0);" class="btn btn--large btn--primary {% if block.settings.button_action == 'addtocart' %}product_bfcm_bottom_btn{% else %}scroll_top_form{% endif %}">{{ block.settings.bottom_btn }}</a>
+        </div>
+          {% endif %}
+  </div>
+  
+    </div>
+  </div>
+  {% endif %}
+
+
+  {% if block.type == 'products_row_content' %}
+  <div class="product_two_columns_img_w_text three_columns_content products_row_content {{ block.id }}" style="{% if block.settings.back_img != blank %}background-image: url({{ block.settings.back_img | img_url: 'master' }});{% else %}background-color:{{ block.settings.back_color }};{% endif %}">
+  <div class="wrapper">
+    <div class="top_content text-center">
+      <div class="top_content_inner">
+        {% if block.settings.title != blank %}
+          <h2 class="heading" style="color:{{block.settings.heading_color}};">{{ block.settings.title }}</h2>
+        {% endif %}
+        {% if block.settings.subheading != blank %}
+          <p class="shbheading"  style="color:{{block.settings.heading_color}};">{{ block.settings.subheading }}</p>
+        {% endif %}
+      </div>
+    </div>
+    
+    {% if block.settings.richtext != blank %}
+      <div class="page__content text-left" style="background:{{ block.settings.box_bkg_color }}">
+        <div  style="color:{{block.settings.text_color}};">{{ block.settings.richtext }}</div>
+      </div>
+    {% endif %}
+    <div class="columns_header">
+    <div class="columns_header_left">
+     {% if block.settings.columns_title != blank %}
+      <p class="heading" style="color:{{block.settings.heading_color}};">{{ block.settings.columns_title }}</p>
+       {% endif %}
+    </div>
+    <div class="columns_header_right">
+      <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="25" cy="25" r="25" fill="#C9A15B"/>
+        <path d="M34.4338 28.8086C32.0011 28.8086 30.022 30.7877 30.022 33.2204C30.022 35.6531 32.0011 37.6321 34.4338 37.6321C36.8669 37.6321 38.8456 35.6531 38.8456 33.2204C38.8456 30.7877 36.8665 28.8086 34.4338 28.8086ZM34.4338 35.4263C33.2173 35.4263 32.2279 34.4369 32.2279 33.2204C32.2279 32.0038 33.2173 31.0145 34.4338 31.0145C35.6503 31.0145 36.6397 32.0038 36.6397 33.2204C36.6397 34.437 35.6503 35.4263 34.4338 35.4263Z" fill="black"/>
+        <path d="M19.3603 28.8086C16.9276 28.8086 14.9485 30.7877 14.9485 33.2204C14.9485 35.6531 16.9276 37.6321 19.3603 37.6321C21.793 37.6321 23.7721 35.6531 23.7721 33.2204C23.7721 30.7877 21.793 28.8086 19.3603 28.8086ZM19.3603 35.4263C18.1438 35.4263 17.1544 34.4369 17.1544 33.2204C17.1544 32.0038 18.1438 31.0145 19.3603 31.0145C20.5765 31.0145 21.5662 32.0038 21.5662 33.2204C21.5662 34.437 20.5768 35.4263 19.3603 35.4263Z" fill="black"/>
+        <path d="M37.4048 16.1811C37.2173 15.8087 36.836 15.5737 36.4191 15.5737H30.6103V17.7796H35.7389L38.7422 23.7531L40.7136 22.7619L37.4048 16.1811Z" fill="black"/>
+        <path d="M31.125 32.1543H22.7794V34.3602H31.125V32.1543Z" fill="black"/>
+        <path d="M16.0514 32.1543H12.228C11.6187 32.1543 11.125 32.6481 11.125 33.2572C11.125 33.8664 11.6188 34.3601 12.228 34.3601H16.0515C16.6607 34.3601 17.1544 33.8664 17.1544 33.2572C17.1544 32.648 16.6607 32.1543 16.0514 32.1543Z" fill="black"/>
+        <path d="M42.7684 25.4118L40.5989 22.6177C40.3905 22.3485 40.0688 22.1912 39.728 22.1912H31.7132V14.4706C31.7132 13.8614 31.2195 13.3677 30.6103 13.3677H12.228C11.6187 13.3677 11.125 13.8614 11.125 14.4706C11.125 15.0797 11.6188 15.5735 12.228 15.5735H29.5074V23.2941C29.5074 23.9033 30.0011 24.397 30.6103 24.397H39.1879L40.7941 26.4661V32.1543H37.7426C37.1334 32.1543 36.6397 32.6481 36.6397 33.2572C36.6397 33.8665 37.1335 34.3602 37.7426 34.3602H41.897C42.5062 34.3602 42.9999 33.8664 43 33.2572V26.0883C43 25.8434 42.9184 25.6052 42.7684 25.4118Z" fill="black"/>
+        <path d="M15.978 26.5664H10.9044C10.2952 26.5664 9.80148 27.0602 9.80148 27.6693C9.80148 28.2785 10.2952 28.7722 10.9044 28.7722H15.9779C16.5871 28.7722 17.0808 28.2785 17.0808 27.6693C17.0809 27.0602 16.5871 26.5664 15.978 26.5664Z" fill="black"/>
+        <path d="M18.5147 22.228H9.10291C8.49376 22.228 8 22.7218 8 23.331C8 23.9402 8.49376 24.4339 9.10291 24.4339H18.5147C19.1239 24.4339 19.6176 23.9402 19.6176 23.331C19.6176 22.7219 19.1239 22.228 18.5147 22.228Z" fill="black"/>
+        <path d="M20.3162 17.8896H10.9044C10.2952 17.8896 9.80148 18.3834 9.80148 18.9926C9.80148 19.6018 10.2952 20.0955 10.9044 20.0955H20.3162C20.9254 20.0955 21.4191 19.6017 21.4191 18.9926C21.4192 18.3834 20.9254 17.8896 20.3162 17.8896Z" fill="black"/>
+      </svg>
+     
+        <p class="heading" style="color:{{block.settings.heading_color}};">{{ block.settings.free_shipping }}</p>
+      
+        </div>
+    </div>
+    <div class="coverd_column_all_content clearfix">
+      {% for i in (1..7) %}
+          {% capture enable %}enable_{{i}}{% endcapture %}
+          {% capture image %}image_{{i}}{% endcapture %}
+          {% capture product_title %}title_{{i}}{% endcapture %}
+          {% capture custom_html %}custom_html_{{i}}{% endcapture %}
+          {% capture compare_at_price %}compare_at_price_{{i}}{% endcapture %}
+          {% capture price_html %}price_html_{{ i }}{% endcapture %}
+
+{% if block.settings[enable] != blank  %}
+<div class="inner_column_content_wrapper" style="background:{{ block.settings.box_bkg_color }};color:{{ block.settings.box_text_color }};">
+    <style>.products_row_content.{{ block.id }} .row_product_title:after{ 
+  background:{{ block.settings.box_text_color }} !important;
+  }</style>
+  <div class="inner_column_content">
+ 
+    <div class="inner__column image_column">
+      <div class="image">
+        {% if block.settings[image] != blank %}
+          <img class="lazyload" data-src="{{ block.settings[image] | img_url: 'original' }}" width="{{ block.settings[image].width }}" height="{{ block.settings[image].height }}" style="height:auto">
+        {% else %}
+          {{ 'image' | placeholder_svg_tag }}
+        {% endif %}
+      </div>
+    </div>
+    <div class="inner__column content_column">
+      {% if block.settings[product_title] != blank %}
+        <div class="row_product_title">{{ block.settings[product_title] }}</div>
+      {% endif %}
+  
+      {% if block.settings[custom_html] != blank %}
+        <div class="inner__column_html">
+          <div style="color:{{block.settings.text_color}};">{{ block.settings[custom_html] }}</div>
+        </div>
+      {% endif %}
+    </div>
+    <div class="inner__column price_column">
+      {% if block.settings[price_html] != blank %}
+          {{ block.settings[price_html] }}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endfor %}
+</div>
+<div class="bottom_content text-center">
+{% if block.settings.bottom_btn != blank %}
+<div class="bottom_btn">
+<a  href="javascript:void(0);" class="btn btn--large btn--primary {% if block.settings.button_action == 'addtocart' %}product_bfcm_bottom_btn{% else %}scroll_top_form{% endif %}">{{ block.settings.bottom_btn }}</a>
+</div>
+{% endif %}
+
+      <div class="columns_header">
+      <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="25" cy="25" r="25" fill="#C9A15B"/>
+        <path d="M34.4338 28.8086C32.0011 28.8086 30.022 30.7877 30.022 33.2204C30.022 35.6531 32.0011 37.6321 34.4338 37.6321C36.8669 37.6321 38.8456 35.6531 38.8456 33.2204C38.8456 30.7877 36.8665 28.8086 34.4338 28.8086ZM34.4338 35.4263C33.2173 35.4263 32.2279 34.4369 32.2279 33.2204C32.2279 32.0038 33.2173 31.0145 34.4338 31.0145C35.6503 31.0145 36.6397 32.0038 36.6397 33.2204C36.6397 34.437 35.6503 35.4263 34.4338 35.4263Z" fill="black"/>
+        <path d="M19.3603 28.8086C16.9276 28.8086 14.9485 30.7877 14.9485 33.2204C14.9485 35.6531 16.9276 37.6321 19.3603 37.6321C21.793 37.6321 23.7721 35.6531 23.7721 33.2204C23.7721 30.7877 21.793 28.8086 19.3603 28.8086ZM19.3603 35.4263C18.1438 35.4263 17.1544 34.4369 17.1544 33.2204C17.1544 32.0038 18.1438 31.0145 19.3603 31.0145C20.5765 31.0145 21.5662 32.0038 21.5662 33.2204C21.5662 34.437 20.5768 35.4263 19.3603 35.4263Z" fill="black"/>
+        <path d="M37.4048 16.1811C37.2173 15.8087 36.836 15.5737 36.4191 15.5737H30.6103V17.7796H35.7389L38.7422 23.7531L40.7136 22.7619L37.4048 16.1811Z" fill="black"/>
+        <path d="M31.125 32.1543H22.7794V34.3602H31.125V32.1543Z" fill="black"/>
+        <path d="M16.0514 32.1543H12.228C11.6187 32.1543 11.125 32.6481 11.125 33.2572C11.125 33.8664 11.6188 34.3601 12.228 34.3601H16.0515C16.6607 34.3601 17.1544 33.8664 17.1544 33.2572C17.1544 32.648 16.6607 32.1543 16.0514 32.1543Z" fill="black"/>
+        <path d="M42.7684 25.4118L40.5989 22.6177C40.3905 22.3485 40.0688 22.1912 39.728 22.1912H31.7132V14.4706C31.7132 13.8614 31.2195 13.3677 30.6103 13.3677H12.228C11.6187 13.3677 11.125 13.8614 11.125 14.4706C11.125 15.0797 11.6188 15.5735 12.228 15.5735H29.5074V23.2941C29.5074 23.9033 30.0011 24.397 30.6103 24.397H39.1879L40.7941 26.4661V32.1543H37.7426C37.1334 32.1543 36.6397 32.6481 36.6397 33.2572C36.6397 33.8665 37.1335 34.3602 37.7426 34.3602H41.897C42.5062 34.3602 42.9999 33.8664 43 33.2572V26.0883C43 25.8434 42.9184 25.6052 42.7684 25.4118Z" fill="black"/>
+        <path d="M15.978 26.5664H10.9044C10.2952 26.5664 9.80148 27.0602 9.80148 27.6693C9.80148 28.2785 10.2952 28.7722 10.9044 28.7722H15.9779C16.5871 28.7722 17.0808 28.2785 17.0808 27.6693C17.0809 27.0602 16.5871 26.5664 15.978 26.5664Z" fill="black"/>
+        <path d="M18.5147 22.228H9.10291C8.49376 22.228 8 22.7218 8 23.331C8 23.9402 8.49376 24.4339 9.10291 24.4339H18.5147C19.1239 24.4339 19.6176 23.9402 19.6176 23.331C19.6176 22.7219 19.1239 22.228 18.5147 22.228Z" fill="black"/>
+        <path d="M20.3162 17.8896H10.9044C10.2952 17.8896 9.80148 18.3834 9.80148 18.9926C9.80148 19.6018 10.2952 20.0955 10.9044 20.0955H20.3162C20.9254 20.0955 21.4191 19.6017 21.4191 18.9926C21.4192 18.3834 20.9254 17.8896 20.3162 17.8896Z" fill="black"/>
+      </svg>
+     
+        <p class="heading" style="color:{{block.settings.heading_color}};">{{ block.settings.free_shipping }}</p>
+      
+        </div>
+</div>
+</div>
+</div>
+{% endif %}
+
+  {%- endfor -%}
+</div>
+
+{%- if section.settings.product_reviews_enable -%}
+<div class="wrapper">
+  <div id="shopify-product-reviews" data-id="{{product.id}}">{{ product.metafields.spr.reviews }}</div>
+</div>
+{%- endif -%}
+
+
+
+
+<script data-product-add-popdown-template type="text/x-template">
+  <div class="product__popdown__outer">
+
+    <div class="product__popdown__textbar">
+        <span class="product__popdown__title">
+          {% raw %}{{ it.product_title }} &nbsp;{% endraw %}
+  </span>
+        <span class="product__popdown__added">
+          {{ 'products.cart_drawer.item_added' | t }}
+  </span>
+  </div>
+
+    <div class="wrapper">
+      <div class="product__popdown__inner">
+        <div class="product__popdown__close">
+          <div class="popdown__close__inner" data-close-popdown>
+            {% render 'icon-close-small' %}
+  </div>
+  </div>
+        {% capture product_image %}{% raw %}{{ it.product_image }}{% endraw %}{% endcapture %}
+        <div class="product__popdown__image">
+          <img alt="{{ product_title }}" src="{{ product_image }}">
+  </div>
+        <div class="product__popdown__cart__wrapper">
+          <a href="{{ routes.cart_url }}" class="product__popdown__cart text-link uppercase">{{ "products.cart_drawer.view_cart" | t }}</a>
+  </div>
+  </div>
+  </div>
+  </div>
+</script>
+
+{% if section.settings.zoom_enable %}
+{% render 'zoom-pswp' %}
+{% endif %}
+
+<script data-product-json type="application/json">
+  {{ product | json }}
+</script>
+
+<script data-product-options-json type="application/json">
+  { "options":[
+    {%- for option in product.options_with_values -%}
+    {
+      "name": "{{ option.name | escape }}",
+      "position": "{{ forloop.index }}",
+      "values": [
+        {%- for value in option.values -%}
+        "{{ value | escape }}"{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ]
+    }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ]}
+</script>
+<a id="reviews"></a>
+<script type="application/json" id="ModelJson-{{ section.id }}">
+  {{ product.media | where: 'media_type', 'model' | json }}
+</script>

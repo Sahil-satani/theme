@@ -1,0 +1,134 @@
+<!-- /sections/page-faq.liquid-->
+
+{% if section.settings.enable != blank %}
+<div class="product_faq_main_section" data-section-id="{{ section.id }}" data-section-type="page-faq" style="background-color:{{ section.settings.back_color }};color:{{ section.settings.text_color }};">
+  <div class="wrapper">
+    <div class="inner_faq_content">
+        {% if section.settings.title != blank %}
+        <h2 class="text-center ">{{ section.settings.title }}</h2>
+        {% endif %}
+        {% for block in section.blocks %}
+        <div class="faq__wrapper">
+          <button class="faq__button{% if forloop.first %} is-visible{% endif %}"
+                  data-accordion-toggle="accordion-{{ block.id }}"
+                  aria-controls="accordion-{{ key }}"
+                  aria-haspopup="true" 
+                  aria-expanded="false"
+                  style="color:{{ section.settings.text_color }};">
+            <span class="accordion__title">{{ block.settings.title }}</span>
+            <span class="accordion__chevron">
+              {% render 'icon-arrow-medium-right' %}
+              <span class="a11y__show visually-hidden">{{ 'general.accessibility.expand_menu' | t }}</span>
+              <span class="a11y__hide visually-hidden">{{ 'general.accessibility.hide_menu' | t }}</span>
+            </span>
+          </button>
+          <div class="accordion__content accordion__content--faq{% if forloop.first %} is-visible{% endif %}" 
+               data-accordion 
+               id="accordion-{{ block.id }}">
+            <span {{ block.shopify_attributes }}></span>
+            {{ block.settings.content }}
+            
+             {% if block.settings.image_1 != blank or block.settings.image_2 != blank %}
+            <div class="content_images clearfix">
+              {% if block.settings.image_1 != blank %}
+              <div class="inner_img">
+                <img src="{{ block.settings.image_1 | img_url: 'original' }}">
+              </div>
+              {% endif %}
+              {% if block.settings.image_2 != blank %}
+              <div class="inner_img">
+                <img src="{{ block.settings.image_2 | img_url: 'original' }}">
+              </div>
+              {% endif %}
+              
+            </div>
+              {% endif %}
+            
+            
+          </div>
+        </div>
+        {% else %}
+        <div class="homepage-page__content rte">
+          {{ 'home_page.onboarding.no_content' | t }}
+        </div>
+        {% endfor %}
+   
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% schema %}
+{
+"name": "FAQ",
+"settings": [
+{
+"type": "checkbox",
+"id": "enable",
+"label": "Enable",
+"default": true
+},
+{
+"type": "text",
+"id": "title",
+"label": "Title",
+"default": "Frequently Asked Questions"
+},
+{
+"type": "color",
+"id": "back_color",
+"label": "Background color",
+"default": "#E4DDD3"
+},
+{
+"type": "color",
+"id": "text_color",
+"label": "Text color",
+"default": "#131B23"
+}
+],
+"blocks": [
+{
+"type": "text",
+"name": "Text block",
+"settings": [
+{
+"type": "text",
+"id": "title",
+"label": "Heading",
+"default": "Frequently asked question"
+},
+{
+"id": "content",
+"type": "richtext",
+"label": "Text",
+"default": "<p>Share details about your shipping policies, item returns, or customer service.</p>"
+},
+{
+"type": "image_picker",
+"id": "image_1",
+"label": "Image 1"
+},
+{
+"type": "image_picker",
+"id": "image_2",
+"label": "Image 2"
+}
+]
+}
+],
+"default": {
+"blocks": [
+{
+"type": "text"
+},
+{
+"type": "text"
+},
+{
+"type": "text"
+}
+]
+}
+}
+{% endschema %}

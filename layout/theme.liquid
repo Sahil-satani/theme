@@ -1,0 +1,296 @@
+<!doctype html>
+<html class="no-js" lang="{{ shop.locale }}">
+<head>
+<link rel='preconnect dns-prefetch' href='https://api.config-security.com/' crossorigin />
+<link rel='preconnect dns-prefetch' href='https://conf.config-security.com/' crossorigin />
+<link rel='preconnect dns-prefetch' href='https://triplewhale-pixel.web.app/' crossorigin />
+  
+<script>
+/* >> TriplePixel :: start*/
+window.TriplePixelData={TripleName:"lovenightshift.myshopify.com",ver:"1.9.0"},function(W,H,A,L,E,_,B,N){function O(U,T,P,H,R){void 0===R&&(R=!1),H=new XMLHttpRequest,P?(H.open("POST",U,!0),H.setRequestHeader("Content-Type","application/json")):H.open("GET",U,!0),H.send(JSON.stringify(P||{})),H.onreadystatechange=function(){4===H.readyState&&200===H.status?(R=H.responseText,U.includes(".txt")?eval(R):P||(N[B]=R)):(299<H.status||H.status<200)&&T&&!R&&(R=!0,O(U,T-1))}}if(N=window,!N[H+"sn"]){N[H+"sn"]=1;try{A.setItem(H,1+(0|A.getItem(H)||0)),(E=JSON.parse(A.getItem(H+"U")||"[]")).push(location.href),A.setItem(H+"U",JSON.stringify(E))}catch(e){}var i,m,p;A.getItem('"!nC`')||(_=A,A=N,A[H]||(L=function(){return Date.now().toString(36)+"_"+Math.random().toString(36)},E=A[H]=function(t,e){return"State"==t?E.s:(W=L(),(E._q=E._q||[]).push([W,t,e]),W)},E.s="Installed",E._q=[],E.ch=W,B="configSecurityConfModel",N[B]=1,O("//conf.config-security.com/model",5),i=L(),m=A[atob("c2NyZWVu")],_.setItem("di_pmt_wt",i),p={id:i,action:"profile",avatar:_.getItem("auth-security_rand_salt_"),time:m[atob("d2lkdGg=")]+":"+m[atob("aGVpZ2h0")],host:A.TriplePixelData.TripleName,url:window.location.href,ref:document.referrer,ver:window.TriplePixelData.ver},O("//api.config-security.com/",5,p),O("//triplewhale-pixel.web.app/dot1.9.txt",5)))}}("","TriplePixel",localStorage);
+/* << TriplePixel :: end*/
+</script>
+
+{% render 'replo-head' %}
+
+  <!-- noindex this page if the template contains "no-index" in the name -->
+  {% if template.suffix contains 'noindex' %}
+  <meta name = "robots" content = "noindex">
+  {% endif %}  
+  <meta name="google-site-verification" content="aPY6ZtI1kvzlIDndZiYlQKAcKBGu35eJHt4xdZDqNTk" />
+  <meta name="ahrefs-site-verification" content="3b020474296e4b987e02c30389eaaa923d1612622aae07d40010fdf41ac10a92">
+  <meta name="facebook-domain-verification" content="faafzkydbz42x2o1jlivlhbsrieaxq" />
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="{{ settings.color_secondary }}">
+  {%- if canonical_url != blank  -%}
+    <link rel="canonical" href="{{ canonical_url }}">
+  {%- endif -%}
+
+  <!-- ======================= Pipeline Theme V5.0.2 ========================= -->
+
+  <link rel="dns-prefetch" href="https://cdn.shopify.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fonts.shopifycdn.com" crossorigin>
+  <link rel="preload" as="style" href="{{ 'font-settings.css' | asset_url }}" onload="this.rel='stylesheet'">
+  <link rel="preload" as="font" href="{{ 'Inter-Regular.woff2' | asset_url }}" type="font/woff2" crossorigin>
+  <link rel="preload" as="font" href="{{ 'DMSerifDisplay-Regular.woff2' | asset_url }}" type="font/woff2" crossorigin>
+
+  {%- if settings.favicon != blank -%}
+    <link rel="shortcut icon" href="{{ settings.favicon | img_url: '32x32' }}" type="image/png">
+  {%- endif -%}
+
+  <!-- Title and description ================================================ -->
+  {% capture seo_title %}
+    {{ page_title }}
+    {%- if current_tags -%}
+      {%- assign meta_tags = current_tags | join: ', ' %} &ndash; {{ 'general.meta.tags' | t: tags: meta_tags -}}
+    {%- endif -%}
+    {%- if current_page != 1 -%}
+      &ndash; {{ 'general.meta.page' | t: page: current_page }}
+    {%- endif -%}
+    {%- unless page_title contains shop.name -%}
+      &ndash; {{ shop.name }}
+    {%- endunless -%}
+  {% endcapture %}
+  <title>
+    {{ seo_title }}
+  </title>
+
+  {%- if page_description -%}
+    <meta name="description" content="{{ page_description | escape }}">
+  {%- endif -%}
+
+  {%- render 'social-meta-tags' -%}
+
+  <!-- CSS ================================================================== -->
+
+  {% render 'css-variables' %}
+
+  <style>   
+    @font-face {
+      font-family: 'icons';
+      src: url('{{ "icons.eot" | asset_url }}');
+        src: url('{{ "icons.eot" | asset_url }}#iefix') format("embedded-opentype"),
+          url('{{ "icons.woff" | asset_url }}') format("woff"),
+            url('{{ "icons.ttf" | asset_url }}') format("truetype"),
+              url('{{ "icons.svg" | asset_url }}#timber-icons') format("svg");
+                font-weight: normal;
+                font-style: normal;
+                }
+
+    .btn{
+      background-color:{{settings.color_btn_background}} !important;
+      color:{{settings.color_btn_text }} !important;
+      border:1px solid {{settings.color_btn_background}} !important;
+    }
+    .btn:hover,.coverd_img_footer_coll .sticker{
+      background-color:{{settings.color_hover_btn_background}} !important;
+      color:{{settings.color_hover_btn_text }} !important;
+    }
+  </style>
+
+  {% render 'style-tags' %}
+
+ 
+    <link rel="preload" as="style" href="//cdn1.stamped.io/files/widget.min.css" onload="this.rel='stylesheet'">
+    {% render 'script-tags' %}
+    
+    {% render 'tracking-scripts' %}
+ 
+  
+  {% render 'spdn' %}
+
+  {{content_for_header}}
+  
+</head>
+
+<body id="{{ page_title | handle }}" class="template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}{% if customer %} customer-logged-in{% endif %}" data-animations="{{ settings.animations_enable }}">
+  
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KZ2WWD2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  
+  <a class="in-page-link visually-hidden skip-link" href="#MainContent">{{ 'general.accessibility.skip_to_content' | t }}</a>
+
+  {% section 'announcement' %}
+  {% section 'header' %}
+
+  <main class="main-content" id="MainContent" role="main" {% if template contains 'product' %}style="padding-bottom:0;"{% endif %}>
+    {{ content_for_layout }}
+  </main>
+
+  {% unless template == 'cart' %}
+  {% section 'footer' %}
+  {% section 'Footer-Collection' %}
+ 
+{% endunless %}
+{% section 'footer2' %}
+  
+  {% render 'search-popdown' %}
+
+  <div data-modal-container></div>
+
+  {%- comment -%}
+    In order to use your custom javascript file at assets/custom.js
+    just cut this next line and paste it outside this comment:
+    <script src="{{ 'custom.js' | asset_url }}" defer="defer"></script>
+  {%- endcomment -%}
+
+  {% if template.name == 'product' %}
+  <a href="javascript:void(0);" class="product_backtoTop">&uarr; <span>BACK TO<br>TOP</span></a>
+
+  <style>
+    .product_backtoTop{
+      position: fixed;
+      z-index: 9999;
+      right: 20px;
+      bottom: 20px;
+      background-color: #c9a15b;
+      padding: 10px 6px;
+      font-size: 22px;
+      border-radius: 5px;
+      color: #fff;
+      display: none;
+      text-align:center;
+      line-height:1;
+    }
+    .product_backtoTop span{
+      font-size:11px;
+      display:block;
+      line-height:1.2;
+    }
+    .product_backtoTop:hover{
+      color: #fff;
+    }
+  </style>
+
+  <script>
+    /* var get_top_btn = document.querySelector('.product_backtoTop');
+
+    window.onscroll = function() {scrollFunction()};
+
+    function scrollFunction() {
+      if (document.documentElement.scrollTop > 100) {
+        get_top_btn.style.display = "block";
+      } else {
+        get_top_btn.style.display = "none";
+      }
+    }
+    get_top_btn.addEventListener("click", function() {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    });*/
+
+    $(document).ready(function(){ 
+      $(window).scroll(function(){ 
+        if ($(this).scrollTop() > 100) { 
+          $('.product_backtoTop').fadeIn(); 
+        } else { 
+          $('.product_backtoTop').fadeOut(); 
+        } 
+      }); 
+      $('.product_backtoTop').click(function(){ 
+        $("html, body").animate({ scrollTop: 0 }, 600); 
+        return false; 
+      }); 
+    });
+  </script>
+  
+  {% endif %}
+  {% unless settings.checkout_btn_additional_buttons != blank %}
+    <style>
+    .additional-checkout-buttons{
+      display: none !important;
+    }
+    </style>
+  {% endunless %}
+
+{% if product %}
+<script type="text/javascript">
+var _learnq = _learnq || [];
+  var classname = document.getElementsByClassName("btn--add-to-cart");
+var addToCart = function() {
+_learnq.push(['track', 'Added to Cart', item]);
+}; for (var i = 0; i < classname.length; i++) {
+classname[i].addEventListener('click', addToCart, false);
+}
+</script>
+{% endif %}
+
+  <style>
+   
+@media only screen and (max-width: 991px){
+.site-footer-wrapper .footer_pages_blocks {
+    width: 100% !important;
+}
+   /* .homepage-collection .all_page_view_pro {
+    font-size:15px !important;
+  } */
+}
+    .product__grid__info a{
+      display:block !important;
+    }
+.cart__body .item__price--aftersale{
+          text-decoration: line-through;
+    }
+    .cart__body .cart_original_price {
+    display: block;
+    text-decoration: line-through;
+}
+    .cart__footer .cart__footer_main_cover {
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    justify-content: end;
+}
+    .cart__footer .totle_orignal_price {
+    display: block;
+    text-decoration: line-through;
+}
+    @media (max-width: 767px){
+  .cover_gift_wrapping .inner_cover_text{
+    display: block;
+  }
+  .cover_gift_wrapping .cover_checkbox_giftcart {
+    width: 10%;
+    margin-right: 4px;
+    float: left;
+  }
+  .cover_gift_wrapping .cover_gift-wrapping_pro {
+    width: 90%;
+    text-align: left;
+  }
+  .cover_gift_wrapping .cover_gift_price {
+    width: 20%;
+  }
+       .b-app__ATC-container #b-app-os .b-app-os__selector .b-app-os__offer .b-app-os__main{
+      flex-wrap: wrap !important;
+    }
+      .b-app__ATC-container #b-app-os .b-app-os__selector .b-app-os__offer .b-app-os__prices{
+      align-items: flex-start !important;
+      margin-left: 30px !important;
+    margin-top: 8px !important;
+        width: 100% !important;
+        flex-direction: row;
+    }
+      .addtocart_below_images .common_img_part .image{
+        float: none;
+        margin: 0 auto;
+      }
+      #shopify-section-cart .addtocart_below_images .common_img_part .text{
+            text-align: center;
+    width: 100%;
+      }
+}
+  </style>
+  
+  
+ 
+<!-- Stamped - Begin script -->  
+<script>function myInit(){ StampedFn.init({ apiKey: 'pubkey-7vPNUdEzSIyjqIT14kUrxs7Z49mB51', sId: '148330' }); }</script>
+<script async onload="myInit()" type="text/javascript" src="https://cdn1.stamped.io/files/widget.min.js"></script>
+<!-- Stamped - End script -->
+ 
+</body>
+</html>

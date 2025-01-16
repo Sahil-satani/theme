@@ -1,0 +1,259 @@
+<style>
+  #shopify-section-footer p,#shopify-section-footer a,.site-footer-wrapper a{
+    font-size: 18px;
+  }
+  #shopify-section-footer .footer__title{
+    color:{{ settings.color_footer_heading }};
+        margin-top: 0;
+  }
+  @media only screen and (max-width: 767px){   
+    #shopify-section-footer p,#shopify-section-footer a,.site-footer-wrapper a{
+      font-size: 16px;
+    }
+  }
+</style>
+
+<footer class="site-footer-wrapper"
+        role="contentinfo"
+        data-section-id="{{ section.id }}"
+        data-section-type="footer">
+  {% if section.settings.footer_image %}
+  <div class="footer-logo-wrapper">
+    <a href="{{ routes.root_url }}" class="footer-logo" data-footer-logo>
+      <img src="{{ section.settings.footer_image | img_url: 'x200' }}" alt="{{ section.settings.footer_image.alt | default: shop.name }}"/>
+    </a>
+  </div>
+  {% endif %}
+  <div class="wrapper site-footer">
+    <div class="grid grid--uniform footer_first_grid">
+
+      {% case section.blocks.size %}
+      {% when 0 %}
+      {% when 1 %}
+      {% assign footer_column_width = 'medium-up--one-half medium-up--push-one-quarter' %}
+      {% when 2 %}
+      {% assign footer_column_width = 'medium-up--one-half' %}
+      {% when 3 %}
+      {% assign footer_column_width = 'medium-up--one-third' %}
+      {% when 4 %}
+      {% assign footer_column_width = 'medium-up--one-quarter' %}
+      {% endcase %}
+
+      {% for block in section.blocks %}
+      {% case block.type %}
+
+      {% when 'linklist' %}
+      {% assign linklist = linklists[block.settings.linklist] %}
+      <div class="grid__item {{ footer_column_width }} footer__block footer_linklist_block" {{ block.shopify_attributes }} style="width:{{ block.settings.column_width }}%;">
+
+
+        <ul class="footer-quicklinks">
+          {% for link in linklist.links %}
+          <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      {% when 'page' %}
+      {% assign page = pages[block.settings.page] %}
+      {% if page == blank or page.empty? %}
+      <div class="grid__item {{ footer_column_width }} footer__block footer_pages_blocks" {{ block.shopify_attributes }} style="width:{{ block.settings.column_width }}%;">
+          <p class="footer__title">{{ shop.name }}</p>
+
+          <div class="rte rte--column">{{ 'home_page.onboarding.no_content' | t }}</div>
+
+      </div>
+      {% else %}
+      <div class="grid__item {{ footer_column_width }} footer__block footer_pages_blocks" {{ block.shopify_attributes }} style="width:{{ block.settings.column_width }}%;">
+       
+          <p class="footer__title">{{ page.title | escape }}</p>
+
+          <div class="rte rte--column">{{ page.content }}</div>
+   
+      </div>
+      {% endif %}
+
+      {% when 'text' %}
+      <div class="grid__item {{ footer_column_width }} footer__block footer_text_blocks" {{ block.shopify_attributes }} style="width:{{ block.settings.column_width }}%;">
+        <div class="inner_text_block">
+          <p class="footer__title">{{ block.settings.title | escape }}</p>
+
+          <div class="rte rte--column">{{ block.settings.text }}</div>
+        </div>
+      </div>
+
+      {% when 'newsletter' %}
+      <div class="grid__item {{ footer_column_width }} footer__block newsletter_block_footer" {{ block.shopify_attributes }} style="width:{{ block.settings.column_width }}%;">
+        <p class="footer__title">{{ 'layout.footer.newsletter_title' | t }}</p>
+
+        <div class="rte rte--column">
+          {{ block.settings.richtext }}
+        </div>
+        {% render 'newsletter-form' %}
+      </div>
+
+      {% else %}
+      {% endcase %}
+      {% endfor %}
+    </div>
+
+  </div>
+</footer>
+
+{% schema %}
+{
+"name": "Footer",
+"max_blocks": 4,
+"settings": [
+{
+"label": "Footer logo",
+"type": "image_picker",
+"id": "footer_image",
+"info": "400 x 200px .png"
+},
+{
+"type": "header",
+"content": "Bottom bar"
+},
+{
+"type": "link_list",
+"id": "footer_secondary_linklist",
+"label": "Link List",
+"info": "This menu won't show dropdown items"
+},
+{
+"type": "checkbox",
+"id": "footer_payment_enable",
+"label": "Show payment types"
+},
+{
+"type": "checkbox",
+"id": "footer_social_enable",
+"label": "Show social icons"
+},
+{
+"type": "header",
+"content": "language selector",
+"info": "To add a language, go to your [language settings.](/admin/settings/languages)"
+},
+{
+"type": "checkbox",
+"id": "show_locale_selector",
+"label": "Show language selector",
+"default": true
+},
+{
+"type": "header",
+"content": "Currency selector",
+"info": "To add a currency, go to your [payment settings.](/admin/settings/payments)"
+},
+{
+"type": "checkbox",
+"id": "show_currency_selector",
+"label": "Show currency selector",
+"default": true
+}
+],
+"blocks" : [
+{
+"type": "linklist",
+"name": "Link list",
+"settings": [
+{
+"type": "link_list",
+"id": "linklist",
+"label": "Link list",
+"default": "main-menu",
+"info": "This menu won't show dropdown items"
+},
+{
+  "type": "range",
+  "id": "column_width",
+  "min": 0,
+  "max": 100,
+  "step": 1,
+  "unit": "%",
+  "label": "Column width",
+  "default": 33
+}
+]
+},
+{
+"type": "newsletter",
+"name": "Newsletter",
+"limit": 1,
+"settings": [
+{
+"type": "paragraph",
+"content": "Subscribers are under 'Accepts Marketing' in your [customer admin](/admin/customers)."
+},
+{
+"id": "richtext",
+"type": "richtext",
+"label": "Newsletter description",
+"default": "<p>Join to get special offers, free giveaways, and once-in-a-lifetime deals.</p>"
+},
+{
+  "type": "range",
+  "id": "column_width",
+  "min": 0,
+  "max": 100,
+  "step": 1,
+  "unit": "%",
+  "label": "Column width",
+  "default": 33
+}
+]
+},
+{
+"type": "text",
+"name": "Text",
+"settings": [
+{
+"type": "text",
+"id": "title",
+"label": "Heading",
+"default": "Text column"
+},
+{
+"type": "richtext",
+"id": "text",
+"label": "Text",
+"default": "<p>Share store details, promotions, or brand content with your customers.</p>"
+},
+{
+  "type": "range",
+  "id": "column_width",
+  "min": 0,
+  "max": 100,
+  "step": 1,
+  "unit": "%",
+  "label": "Column width",
+  "default": 33
+}
+]
+},
+{
+"type": "page",
+"name": "Page",
+"settings": [
+{
+"id": "page",
+"type": "page",
+"label": "Page"
+},
+{
+  "type": "range",
+  "id": "column_width",
+  "min": 0,
+  "max": 100,
+  "step": 1,
+  "unit": "%",
+  "label": "Column width",
+  "default": 33
+}
+]
+}
+]
+}
+{% endschema %}

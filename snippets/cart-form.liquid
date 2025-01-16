@@ -1,0 +1,484 @@
+<!-- /snippets/cart-form.liquid -->
+{% comment %}
+  * The entire cart body, abstracted out ot cart template for AJAX cart calls
+  * cart {object} - the cart
+  {% render 'cart-form', cart: cart %}
+{% endcomment %}
+
+<div class="cart__body">
+  {% for item in cart.items %}
+    {%- assign discounted = false -%}
+    {%- if item.original_price > item.final_price -%}
+      {%- assign discounted = true -%}
+    {%- endif -%}
+    {%- assign sale = false -%}
+    {%- if item.variant.compare_at_price > item.price -%}
+      {%- assign sale = true -%}
+    {%- endif -%}
+
+    <div class="cart__row">
+      <div class="item--loadbar" style="display: none;"></div>
+      <div class="grid--full cart__row--table-large">
+
+        <div class="grid__item medium-up--one-half">
+          <div class="grid--full cart__row--table-large">
+
+            <div class="grid__item one-third mobile--one-quarter">
+     {% if item.product.handle != settings.free_gift_product %}  
+              <a href="{{ item.url }}" class="cart__image">
+       {% else %}
+       <div class="cart__image">
+       {% endif %}
+                <img src="{{ item | img_url: '200x' }}" alt="{{ item.title | escape }}">
+     {% if item.product.handle != settings.free_gift_product %}  
+              </a>
+       {% else %}
+       </div>
+       {% endif %}
+            </div>
+
+            <div class="grid__item two-thirds mobile--three-quarters cart__item__title">
+              <p>
+                  {% if item.product.handle != settings.free_gift_product %}  
+                <a href="{{ item.url }}" class="expanding-line">
+                    {% endif %}
+                {{ item.product.title }}
+<span class='booster-cart-item-success-notes' data-key='{{item.key}}'></span><span class='booster-cart-item-upsell-notes' data-key='{{item.key}}'></span>
+    {% if item.product.handle != settings.free_gift_product %}  
+                </a>
+      {% endif %}
+              </p>
+              {% unless item.product.has_only_default_variant %}
+                <p class="small">{{ item.variant.title }}</p>
+              {% endunless %}
+
+              <p class="item__vendor">{{ item.vendor }}</p>
+
+
+    {% comment %}
+              {% assign property_size = item.properties | size %}
+              {% if property_size > 0 %}
+                {% for p in item.properties %}
+              
+     
+              {% assign property_first_char = p.first | slice: 0 %}
+              {% if p.first != 'Addon' %}
+              {% if property_first_char != '_' %}
+              {% unless p.last == blank %}
+              {{ p.first }}:
+
+              
+             // Check if there was an uploaded file associated
+              
+              {% if p.last contains '/uploads/' %}
+              <a href="{{ p.last }}">{{ p.last | split: '/' | last }}</a>
+              {% else %}
+              {{ p.last }}
+              {% endif %}
+
+              <br>
+              {% endunless %}
+              {% endif %}
+              {% endif %}
+                {% endfor %}
+              {% endif %}
+   {% endcomment %}
+
+              {% if discounted and item.quantity >= 1 %}
+                {%- for discount in item.line_level_discount_allocations -%}
+                  <div>
+                    <span class="item__total__savings">
+                      <span class="cart__icon--tags">
+                        {% render 'icon-tags' %}
+                      </span>
+                      {{ 'cart.general.savings' | t }}
+                      {{ discount.amount | money_without_trailing_zeros }}
+                      {{ 'cart.general.with' | t }}
+                      {{ discount.discount_application.title }}
+                    </span>
+                  </div>
+                {%- endfor -%}
+              {% endif %}
+
+              <a href="{{ routes.cart_change_url }}?line={{ forloop.index }}&amp;quantity=0"
+                  class="cart__remove badge">
+                {{ 'cart.general.remove' | t }}
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="grid__item medium-up--one-half">
+          <div class="grid--full cart__row--table-large cart__line__nums">
+            <div class="grid__item one-third text-left">
+              <span class="cart__mini-labels">{{ 'cart.label.price' | t }}</span>
+              <div class="item__price">
+                {% if sale %}
+                  <p><span class="item__price--sale">{{ item.variant.compare_at_price | money }}</span>
+                  {% if discounted %}
+                    <span class="item__price--aftersale">
+                      {{ item.variant.price | money }}
+                    </span>
+                  {% endif %}
+                  </p>
+                {% endif %}
+                {% if discounted %}
+                  {% unless sale %}
+                    <p><span class="item__price--aftersale">
+                      {{ item.variant.price | money }}
+                    </span></p>
+                  {% endunless %}
+                  {% comment %}
+                  {%- for discount in item.line_level_discount_allocations -%}
+                    <p class="line__discounts">
+                      <span class="item__discount__text">{{ discount.discount_application.title }}:</span>
+                      <span class="item__discount">-{{ discount.amount | divided_by: item.quantity | money }}</span>
+                    </p>
+                  {%- endfor -%}
+                  {% endcomment %}
+                {% endif %}
+                <p class="item__price--final">{{ item.final_price | money }}</p>
+                {% if item.unit_price %}
+                  {% capture unit_price_separator %}
+                    <span aria-hidden="true">/</span><span class="visually-hidden">{{ 'general.accessibility.unit_price_separator' | t }}&nbsp;</span>
+                  {% endcapture %}
+                  {% capture unit_price_base_unit %}
+                    {% if item.unit_price_measurement.reference_value != 1 %}
+                      {{ item.unit_price_measurement.reference_value }}
+                    {% endif %}
+                    {{ item.unit_price_measurement.reference_unit }}
+                  {% endcapture %}
+                  <p class="item__price--unit">
+                    <span class="visually-hidden visually-hidden--inline">{{ 'products.product.unit_price_label' | t }}</span>
+                    <span class="item__price--unit">{{ item.unit_price | money }}{{ unit_price_separator }}{{ unit_price_base_unit }}</span>
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+
+            {% assign enable_free_gift_product = false %}
+            {% if settings.enable_free_gift_bar == true and settings.free_gift_product != blank %}
+             {% assign free_gift_product = all_products[settings.free_gift_product] %}
+              {% if item.variant_id == free_gift_product.first_available_variant.id  %}
+                 {% assign enable_free_gift_product = true %}
+              {% endif %}
+            {% endif %}
+
+            <div class="grid__item one-third text-center cart__line__qty{% if enable_free_gift_product == true %} free_gift_qty{% endif %}">  
+              <div class="cart__qty">
+                <span class="cart__mini-labels">{{ 'cart.label.quantity' | t }}</span>
+                <div class="js-qty quantity-selector">
+                  <span class="js-qty__adjust js-qty__adjust--minus quantity__minus"
+                        data-new-quantity="{{ item.quantity | minus: 1 }}"
+                        data-line-key="{{ item.key }}">&minus;</span>
+                  <input data-quantity-input
+                    class="text quantity js-qty__num"
+                    type="number"
+                    min="1"
+                    size="4"
+                    aria-label="quantity"
+                    pattern="[0-9]*"
+                    id="updates_{{ item.key }}"
+                    name="updates[]"
+                    value="{{ item.quantity }}"
+                    data-line-key="{{ item.key }}"/>
+                  <span class="js-qty__adjust js-qty__adjust--plus quantity__plus"
+                        data-new-quantity="{{ item.quantity | plus: 1 }}"
+                        data-line-key="{{ item.key }}">+</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid__item one-third text-right cart__line__totals">
+              <div class="cart__subtotal">
+                <span class="cart__mini-labels">{{ 'cart.label.total' | t }}</span>
+                 {% if discounted %}
+                <span class="cart_original_price">{{ item.original_price | times:item.quantity | money  }}</span>
+                  {% endif %}
+                <span>{{ item.final_line_price | money }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="cart__row cart__footer">
+
+   {% if settings.enable_free_gift_bar == true and settings.free_gift_product != blank %}
+
+  {% assign threshold = settings.free_gift_amount | times: 100 %}
+  {% assign pending_amount = threshold | minus: cart.total_price %}
+
+   {% if threshold > cart.total_price %}
+
+  <div class="free_gift_content">
+     {% if settings.free_gift_heading != blank %} 
+      <p class="free_gift_heading">{{ settings.free_gift_heading }}</p>
+    {% endif %}
+    <div class="free_gift_info">
+      {% if settings.free_gift_image != blank %}
+      <div class="img_wrapper">
+     <img class="lazyload" src="{{ settings.free_gift_image | img_url: '400x' }}" alt="{{ settings.free_gift_image.alt }}">
+<svg class="gift_icon" width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M62.2531 83.249C84.0463 73.044 93.4404 47.1043 83.2353 25.3111C73.0303 3.51795 47.0906 -5.87611 25.2975 4.32892C3.50427 14.534 -5.88978 40.4736 4.31525 62.2668C14.5203 84.06 40.46 93.4541 62.2531 83.249Z" fill="#E6E3FF"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M60.794 43.8909L61.1922 62.6873L45.7127 63.0152L45.3146 44.2188L60.794 43.8909ZM42.58 63.0816L27.1006 63.4094L26.7024 44.613L42.1819 44.2851L42.58 63.0816ZM45.2443 40.9017L45.0921 33.7149L63.52 33.3245L63.6722 40.5114L45.2443 40.9017ZM41.9594 33.7812L42.1116 40.9681L23.6837 41.3584L23.5315 34.1716L41.9594 33.7812ZM52.2095 21.5806C47.6026 21.6782 44.9126 25.238 43.4969 28.0334C41.7798 25.3044 38.9415 21.8616 34.5188 21.9553C31.2018 22.0256 28.4961 24.8483 28.5664 28.1653C28.5859 29.0867 28.7936 30.1885 29.362 30.9139L21.9909 31.07C21.0695 31.0896 20.348 31.8423 20.3675 32.7637L20.5861 43.0833C20.6056 44.0047 21.3584 44.7262 22.2797 44.7067L23.5697 44.6794L24.003 65.1343C24.0225 66.0557 24.7752 66.7772 25.6966 66.7577L62.9209 65.9692C63.8423 65.9497 64.3796 65.2009 64.36 64.2795L63.9268 43.8245L65.401 43.7933C66.1381 43.7777 66.8596 43.0249 66.8401 42.1035L66.6215 31.7839C66.602 30.8625 65.8493 30.141 65.1121 30.1566L57.741 30.3128C58.0939 29.5679 58.2548 28.4583 58.2353 27.5369C58.165 24.2199 55.5266 21.5103 52.2095 21.5806ZM45.7629 30.5665C46.6374 28.3356 48.7746 24.7875 52.2759 24.7133C53.7501 24.6821 55.0674 25.9447 55.1025 27.6032C55.1338 29.0775 54.0554 30.3908 52.3969 30.426L45.7629 30.5665ZM34.5219 30.8046C33.0476 30.8358 31.7303 29.5732 31.6991 28.099C31.664 26.4405 32.9266 25.1232 34.5851 25.0881C38.0864 25.0139 40.1877 28.4723 41.1559 30.6641L34.5219 30.8046Z" fill="black"/>
+</svg>
+      </div>
+        {% endif %}
+        <div class="info_inner">
+          {% if settings.free_gift_title != blank %}
+          <p class="free_gift_title">{{ settings.free_gift_title }}</p>
+          {% endif %}
+          <div class="free_gift_price_wrap">
+            {% if settings.free_gift_price != blank %}
+            <p class="free_gift_price">{{ settings.free_gift_price }}</p>
+            {% endif %}
+            <p>FREE</p>
+          </div>
+          <div class="unlock_btn">
+            <svg width="19" height="28" viewBox="0 0 19 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16.3356 12.5157V6.99992C16.3356 3.13994 13.1954 0 9.33568 0C5.47599 0 2.33576 3.13994 2.33576 6.99992V12.5125C0.887024 14.1575 0 16.3084 0 18.6668C0 23.8117 4.18828 28 9.33323 28C14.484 28 18.6665 23.8117 18.6665 18.6668C18.6665 16.31 17.7819 14.1603 16.3356 12.5157ZM9.33568 2.33331C11.9088 2.33331 14.0023 4.42679 14.0023 6.99992V10.597C12.6275 9.79856 11.0357 9.33355 9.33323 9.33355C7.63363 9.33355 6.04336 9.79799 4.66907 10.5956V6.99992C4.66907 4.42679 6.76255 2.33331 9.33568 2.33331ZM9.91873 22.0836V24.4997C9.91873 24.8221 9.65754 25.083 9.3354 25.083C9.01326 25.083 8.75207 24.8221 8.75207 24.4997V22.0844C7.74923 21.8244 6.99992 20.92 6.99992 19.8334C6.99992 18.5443 8.0499 17.5001 9.33323 17.5001C10.6224 17.5001 11.6665 18.5443 11.6665 19.8334C11.6665 20.9191 10.9225 21.8228 9.91873 22.0836Z" fill="#999999"/>
+            </svg>
+            <span>spend another {{ pending_amount | money_without_trailing_zeros | remove: 'AU' }} to unlock</span>
+          </div>  
+        </div>
+    </div>
+  </div>
+     {% endif %}
+{% endif %}
+     
+  <div class="grid">
+    	{% comment %}
+
+<div class="black_friday_sale">
+  <a href="collections/black-friday" class="black_friday_sale_btn btn"><span style="font-weight: 600;">CONTINUE SHOPPING <span class="black_friday_btn_text">BLACK FRIDAY SALE</span></span> →</a>
+</div>
+		Optional, add a textarea for special notes
+			- Your theme settings can turn this on or off. Default is on.
+			- Make sure you have name="note" for the message to be submitted properly
+	{% endcomment %}
+    
+    <div class="grid__item medium-up--one-half cart_note_field">
+      <div class="cart__instructions">
+        <label class="cart__instructions__label" for="CartSpecialInstructions">{{ 'cart.general.note' | t }}</label>
+        <textarea name="note" class="input-full" id="CartSpecialInstructions" data-cart-note>{{ cart.note }}</textarea>
+      </div>
+  </div>
+    
+    <div class="grid__item medium-up--one-half text-right">
+      {%- if cart.cart_level_discount_applications.size > 0 -%}
+        <p class="cart__footer__text">
+          <span class="cart__subtotal-title uppercase">{{ 'layout.cart.items_count.other' | t | capitalize }}:</span>
+          <span class="h5--body strong cart__subtotal money">{{ cart.items_subtotal_price | money }}</span>
+        </p>
+        {%- for discount in cart.cart_level_discount_applications -%}
+          <p class="cart__footer__text">
+            <span class="cart__subtotal-title uppercase">{{ discount.title }}:</span>
+            <span class="h5--body strong cart__subtotal money">-{{ discount.total_allocated_amount | money }}</span>
+          </p>
+        {%- endfor -%}
+      {%- endif -%}
+
+
+      <p class="cart__footer__text cart__footer_main_cover">
+        <span class="cart__subtotal-title uppercase">{{ 'cart.general.subtotal' | t }}</span>
+         <span class="cart_totle_price_cover">
+          {% if cart.original_total_price >  cart.total_price %}
+        <span class="totle_orignal_price">{{ cart.original_total_price | money }}</span>
+            {% endif %}
+        <span class="h5--body strong cart__subtotal money"><span class="wh-original-cart-total"><span class='wh-original-price'>{{ cart.total_price | money }}</span></span><span class="wh-cart-total"></span><div class="additional-notes"><span class="wh-minimums-note"></span><span class="wh-extra-note"></span></div></span>
+         </span>
+         </p>
+    {% comment %}
+
+      <p class="cart__footer__text"><em>{{ 'cart.general.shipping_at_checkout' | t }}</em></p>
+{% endcomment %}
+
+      <div class="cart__footer__buttons">
+        <span class="cart__update" data-update>
+          <span class="cart__update__icon">{% render 'icon-sync' %}</span>
+          <button type="submit" name="update" class="text-link">
+            {{ 'cart.general.update' | t }}
+          </button>
+        </span>
+        <span>
+             {% render 'gift-wrapping' %}
+            
+          <button style=" max-width: 450px;" class="all_page_view_pro btn"type="submit" name="checkout" class="btn btn--large checkout__button">
+            {{ 'cart.general.checkout' | t }}
+          </button>
+
+
+
+           {% unless settings.checkout_btn_additional_buttons != blank %}
+        {% if additional_checkout_buttons %}
+		      <div class="grid__item additional-checkout-buttons" style="display:none;">
+		        {{ content_for_additional_checkout_buttons }}
+		      </div>
+		    {% endif %}
+            {% endunless %}
+        </span>
+      </div>
+      
+      {% if settings.additional_products.count != 0 %}
+      <div class="additional_products">
+        {% for product in settings.additional_products %}
+          <div class="products_info_wrap">
+            <div class="products_info_inner">
+            <div class="img_wrapper">
+               <img class="lazyload" src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.featured_image.alt }}">
+            </div>
+            <div class="products_info">
+              <a class="product_title" href="{{ product.url }}">{{ product.title }}</a>
+              <div class="product_price">
+              {%- if product.first_available_variant.compare_at_price > product.first_available_variant.price -%}
+                <span class="product_compare_at_price">{{ product.first_available_variant.compare_at_price | money }}</span>
+              {% endif %}
+              <span class="product_original_price">{{ product.first_available_variant.price | money }}</span>
+              </div>
+            </div>
+            </div>
+            <div class="add_product_btn_wrap">
+              <button class="add_product_btn" data-additional-product-variant="{{ product.first_available_variant.id }}">ADD</button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+             {% if section.settings.enable_imgs != blank %}
+            <div class="addtocart_below_images clearfix">
+
+              {% if section.settings.image_1 != blank or section.settings.text_1 != blank %}
+              <div class="inner_first_img common_img_part clearfix">
+                {% if section.settings.image_1 != blank %}
+                <div class="image">
+                  {{ section.settings.image_1 }}
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_1 != blank %}
+                <div class="text">{{ section.settings.text_1 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+              {% if section.settings.image_2 != blank or section.settings.text_2 != blank %}
+              <div class="inner_second_img common_img_part clearfix">
+                {% if section.settings.image_2 != blank %}
+                <div class="image">
+
+                  {{ section.settings.image_2 }}	
+
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_2 != blank %}
+                <div class="text">{{ section.settings.text_2 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+
+              {% if section.settings.image_3 != blank or section.settings.text_3 != blank %}
+              <div class="inner_third_img common_img_part clearfix">
+                {% if section.settings.image_3 != blank %}
+                <div class="image">
+                  {{ section.settings.image_3 }}
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_3 != blank %}
+                <div class="text">{{ section.settings.text_3 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+              {% if section.settings.image_4 != blank or section.settings.text_4 != blank %}
+              <div class="inner_third_img common_img_part clearfix top_spacing">
+                {% if section.settings.image_4 != blank %}
+                <div class="image">
+                  {{ section.settings.image_4 }}
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_4 != blank %}
+                <div class="text">{{ section.settings.text_4 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+              {% if section.settings.image_5 != blank or section.settings.text_5 != blank %}
+              <div class="inner_third_img common_img_part clearfix top_spacing">
+                {% if section.settings.image_5 != blank %}
+                <div class="image">
+                  {{ section.settings.image_5 }}
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_5 != blank %}
+                <div class="text">{{ section.settings.text_5 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+              {% if section.settings.image_6 != blank or section.settings.text_6 != blank %}
+              <div class="inner_third_img common_img_part clearfix top_spacing">
+                {% if section.settings.image_6 != blank %}
+                <div class="image">
+                  {{ section.settings.image_6 }}
+                </div>
+                {% endif %}
+
+                {% if section.settings.text_6 != blank %}
+                <div class="text">{{ section.settings.text_6 }}</div>
+                {% endif %}
+
+              </div>            
+              {% endif %}
+
+            </div>
+            {% endif %}
+      
+      
+      
+      
+    </div>
+  </div>
+</div>
+
+<style>
+  .button_loadind{
+    pointer-events: none !important;
+  }
+</style>
+{% comment %}
+<script>
+  let checkoutBtn = document.querySelector('.all_page_view_pro')
+  let normalText = checkoutBtn.innerHTML
+  let preloadText = 'Loading...'
+  checkoutBtn.innerHTML = preloadText
+  checkoutBtn.classList.add('button_loadind')
+
+  const interval = setInterval(checkObj, 50)
+  function checkObj(){
+    try {
+      if (AOV_BOOSTER) {
+        clearInterval(interval)
+        document.querySelector('.all_page_view_pro').classList.remove('button_loadind')
+        document.querySelector('.all_page_view_pro').innerHTML = normalText
+      } 
+    } catch (error) {}
+  }
+</script>
+{% endcomment %}

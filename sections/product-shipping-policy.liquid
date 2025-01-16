@@ -1,0 +1,292 @@
+
+{% if section.settings.enable != blank %}
+<div class="product_shipping_policy_block" style="background-color:{{ section.settings.back_color }};color:{{ section.settings.text_color }};">
+  <div class="wrapper">
+
+    <div class="inner_shipping_blocks">
+
+      <div class="First_row_inner clearfix">
+
+        {% if section.settings.image_1 != blank or section.settings.heading_1 != blank or section.settings.text_1 != blank %}
+        <div class="block_left_part common_block_part">
+
+          {% if section.settings.image_1 != blank or section.settings.heading_1 != blank %}
+          <div class="coverd_icon_heading clearfix">
+            {% if section.settings.image_1 != blank %}
+            <div class="icon_img">
+              <img src="{{ section.settings.image_1 | img_url : 'medium' }}">
+            </div>
+            {% endif %}
+
+            {% if section.settings.heading_1 != blank %}
+            <div class="inn_heading">
+              {{ section.settings.heading_1 }}
+            </div>
+            {% endif %}
+
+          </div>
+          {% endif %}
+
+          {% if section.settings.text_1 != blank %}
+          <div class="richtext">
+            {{ section.settings.text_1 }}
+          </div>
+          {% endif %}
+
+        </div>
+        {% endif %}
+
+        {% if section.settings.image_2 != blank or section.settings.heading_2 != blank or section.settings.text_2 != blank %}
+        <div class="block_right_part common_block_part">
+
+          {% if section.settings.image_2 != blank or section.settings.heading_2 != blank %}
+          <div class="coverd_icon_heading clearfix">
+            {% if section.settings.image_2 != blank %}
+            <div class="icon_img">
+              <img src="{{ section.settings.image_2 | img_url : 'medium' }}">
+            </div>
+            {% endif %}
+
+            {% if section.settings.heading_2 != blank %}
+            <div class="inn_heading">
+              {{ section.settings.heading_2 }}
+            </div>
+            {% endif %}
+
+          </div>
+          {% endif %}
+
+          {% if section.settings.text_2 != blank %}
+          <div class="richtext">
+            {{ section.settings.text_2 }}
+          </div>
+          {% endif %}
+
+        </div>
+        {% endif %}
+
+      </div>
+
+      <div class="Second_row_inner">
+        {% if section.settings.image_3 != blank or section.settings.heading_3 != blank or section.settings.text_3 != blank %}
+        <div class="common_block_part full_block_part">
+
+          {% if section.settings.image_3 != blank or section.settings.heading_3 != blank %}
+          <div class="coverd_icon_heading clearfix">
+            {% if section.settings.image_3 != blank %}
+            <div class="icon_img">
+              <img src="{{ section.settings.image_3 | img_url : 'medium' }}">
+            </div>
+            {% endif %}
+
+            {% if section.settings.heading_3 != blank %}
+            <div class="inn_heading">
+              {{ section.settings.heading_3 }}
+            </div>
+            {% endif %}
+
+          </div>
+          {% endif %}
+
+          {% if section.settings.text_3 != blank %}
+          <div class="richtext">
+            {{ section.settings.text_3 }}
+          </div>
+          {% endif %}
+
+        </div>
+        {% endif %}
+
+
+        <div class="last_two_block clearfix">
+          {% if section.settings.heading_4 != blank or section.settings.text_4 != blank %}
+          <div class="block_left_part common_block_part">
+
+            {% if section.settings.heading_4 != blank %}
+            <div class="inn_heading">
+              {{ section.settings.heading_4 }}
+            </div>
+            {% endif %}
+
+            {% if section.settings.text_4 != blank %}
+            <div class="richtext">
+              {{ section.settings.text_4 }}
+            </div>
+            {% endif %}
+
+          </div>
+          {% endif %}
+
+          {% if section.settings.heading_5 != blank or section.settings.text_5 != blank %}
+          <div class="block_right_part common_block_part">
+
+            {% if section.settings.heading_5 != blank %}
+            <div class="inn_heading">
+              {{ section.settings.heading_5 }}
+            </div>
+            {% endif %}
+
+
+            {% if section.settings.text_5 != blank %}
+            <div class="richtext">
+              {{ section.settings.text_5 }}
+            </div>
+            {% endif %}
+
+          </div>
+          {% endif %}
+
+        </div>
+
+      </div>
+
+
+      {% if section.settings.bottom_text != blank %}
+      <div class="bottom_shipping_text text-center">
+        {{ section.settings.bottom_text }}
+      </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+</div>
+{% endif %}
+
+{% schema %}
+{
+"name": "Shipping policy",
+"settings": [
+{
+"type": "checkbox",
+"id": "enable",
+"label": "Enable",
+"default": true
+},
+{
+"type": "color",
+"id": "back_color",
+"label": "Background color",
+"default": "#E4DDD3"
+},
+{
+"type": "color",
+"id": "text_color",
+"label": "Text color",
+"default": "#131B23"
+},
+{
+"type":"header",
+"content":"First block"
+},
+{
+"type": "image_picker",
+"id": "image_1",
+"label": "Icon"
+},
+{
+"type": "text",
+"id": "heading_1",
+"label": "Title",
+"default": "Title"
+},
+{
+"type": "richtext",
+"id": "text_1",
+"label": "Text",
+"default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+},
+{
+"type":"header",
+"content":"Second block"
+},
+{
+"type": "image_picker",
+"id": "image_2",
+"label": "Icon"
+},
+{
+"type": "text",
+"id": "heading_2",
+"label": "Title",
+"default": "Title"
+},
+{
+"type": "richtext",
+"id": "text_2",
+"label": "Text",
+"default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+},
+{
+"type":"header",
+"content":"Third block"
+},
+{
+"type": "image_picker",
+"id": "image_3",
+"label": "Icon"
+},
+{
+"type": "text",
+"id": "heading_3",
+"label": "Title",
+"default": "Title"
+},
+{
+"type": "richtext",
+"id": "text_3",
+"label": "Text",
+"default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+},
+{
+"type":"paragraph",
+"content":"=== Extra content ==="
+},
+{
+"type":"header",
+"content":"First content"
+},
+{
+"type": "text",
+"id": "heading_4",
+"label": "Title",
+"default": "Title"
+},
+{
+"type": "richtext",
+"id": "text_4",
+"label": "Text",
+"default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+},
+{
+"type":"header",
+"content":"Second content"
+},
+{
+"type": "text",
+"id": "heading_5",
+"label": "Title",
+"default": "Title"
+},
+{
+"type": "richtext",
+"id": "text_5",
+"label": "Text",
+"default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+},
+{
+"type": "richtext",
+"id": "bottom_text",
+"label": "Bottom text",
+"default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+}
+
+]
+}
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

@@ -1,0 +1,230 @@
+<!-- /sections/cart.liquid -->
+
+{% assign hide_quantity = 'quantity--hide' %}
+{%- if section.settings.cart_show_quantity -%}
+	{% assign hide_quantity = '' %}
+{%- endif -%}
+
+{% assign hide_vendor = 'vendor--hide' %}
+{%- if section.settings.cart_vendor_enable -%}
+	{% assign hide_vendor = '' %}
+{%- endif -%}
+
+{% assign hide_notes = 'notes--hide' %}
+{%- if section.settings.cart_notes_enable -%}
+	{% assign hide_notes = '' %}
+{%- endif -%}
+
+{% assign no_ajax = 'no--ajax' %}
+{%- if section.settings.enable_ajax -%}
+	{% assign no_ajax = '' %}
+{%- endif -%}
+
+{% assign continue_link = section.settings.cart_continue_browsing | default: routes.all_products_collection_url %}
+
+<div class="cart {{ hide_quantity }} {{ hide_vendor }} {{ hide_notes }} {{ no_ajax }}"  data-section-id="{{ section.id }}" data-section-type="cart" data-ajax-enable="{{ section.settings.enable_ajax }}">
+	{% if cart.item_count == 0 %}
+		{% comment %}
+	    The cart is empty
+	  {% endcomment %}
+	  <div class="cart--empty align--middle-center">
+		  <div class="wrapper">
+	    	<p class="h4--body m0">{{ 'cart.general.empty' | t }}</p>
+				<div class="image-overlay image-overlay-5"></div>
+			</div>
+	  </div>
+		<a href="{{ continue_link }}" class="cart__circle__wrapper">
+			<div class="cart__circle">
+				{% render 'icon-cart' %}
+			</div>
+			<p class="btn" style="margin-top: 15px;margin-top: 15px;border-radius: 5px;padding: 30px;">
+				{{ 'cart.general.continue_browsing' | t }}
+			</p>
+		</a>
+
+	{% else %}
+		<div class="wrapper pt2 pb4">
+			 <form action="{{ routes.cart_url }}" method="post" novalidate class="cart cartForm">
+			 	<h3>{{ 'cart.general.title' | t }}</h3>
+
+
+                  {% if settings.enable_free_gift_bar == true and settings.free_gift_product != blank %}
+                   
+                {% assign threshold = settings.free_gift_amount | times: 100 %}
+                {% assign free_gift_product = settings.free_gift_product %}
+
+                {% if threshold > cart.total_price %}
+                  {% assign pending_amount = threshold | minus: cart.total_price %}
+                  {% assign bar_width = cart.total_price | times: 100 %}
+                  {% assign bar_width_total = bar_width | divided_by: threshold %}
+                 {% else %}
+                  {% assign bar_width_total = 100 %}
+                {% endif %}
+
+                <div class="free_gift_progress_bar" data-free-gift-threshold="{{ threshold }}" data-free-gift-product="{{ free_gift_product.first_available_variant.id }}">
+                    {% if threshold > cart.total_price %}
+                      <p class="free_gift_txt">SPEND <b>{{ pending_amount | money }} more</b> to get a <b>free gift!</b></p>
+                      {% else %}
+                      <p class="free_gift_txt">CONGRATULATIONS! YOU'VE UNLOCKED FREE EARPLUGS!</p>
+                      {% endif %}
+                    <div class="inner_progress_bar">
+                    <span class="bar">
+                      <span class="progress" style="width: {{ bar_width_total }}%;"></span>
+                    </span>
+                    </div>
+                  </div>
+              {% endif %}
+      
+
+			  <div class="errors" data-form-errors style="display: none;"></div>
+				
+				<div class="cart__row medium-down--hide cart__header-labels">
+					<div class="grid--full">
+						<div class="grid__item medium-up--one-half ">
+							<a href="{{ section.settings.cart_continue_browsing | default: routes.all_products_collection_url }}" class="cart__heading cart__return">
+								{% render 'icon-arrow-long-left' %}
+								&nbsp;
+								{{ 'cart.general.continue_browsing' | t }}
+							</a>
+						</div>
+						<div class="grid__item medium-up--one-half">
+							<div class="grid--full">
+								<div class="grid__item one-third medium-down--one-third">
+									<span class="cart__heading">{{ 'cart.label.price' | t }}</span>
+								</div>
+								<div class="grid__item one-third medium-down--one-third text-center cart__qty__th">
+									<span class="cart__heading">{{ 'cart.label.quantity' | t }}</span>
+								</div>
+								<div class="grid__item one-third medium-down--one-third text-right">
+									<span class="cart__heading">{{ 'cart.label.total' | t }}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				{% comment %}
+				  The following snippet is refreshed via ajax with
+					cart.ajax.liquid when the quantity is adjusted.
+				{% endcomment %}
+				<div data-cart-form-wrapper>
+					{% render 'cart-form', cart: cart %}
+				</div>
+
+		   
+		  </form>
+		</div>
+	{% endif %}
+</div>
+
+
+{% schema %}
+{
+  "name": "Cart page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_ajax",
+      "label": "Enable auto refresh",
+      "info": "Disable if apps require manual page reload",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "cart_vendor_enable",
+      "label": "Show product vendor"
+    },
+    {
+      "type": "checkbox",
+      "id": "cart_notes_enable",
+      "label": "Show cart notes"
+    },
+    {
+      "type": "checkbox",
+      "id": "cart_show_quantity",
+      "label": "Show quantity selectors",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "cart_continue_browsing",
+      "label": "Empty cart link",
+      "info": "Continue browsing link for the empty cart"
+    },
+		{
+			"type": "header",
+			"content": "Additional checkout buttons"
+		},
+        {
+        "type":"header",
+        "content":"Below addtocart images"
+        },
+        {
+        "type": "checkbox",
+        "id": "enable_imgs",
+        "label": "Enable",
+        "default": true
+        },
+        {
+        "type": "html",
+        "id": "image_1",
+        "label": "SVG 1"
+        },
+        {
+        "type": "text",
+        "id": "text_1",
+        "label": "Text 1"
+        },
+        {
+        "type": "html",
+        "id": "image_2",
+        "label": "SVG 2"
+        },
+        {
+        "type": "text",
+        "id": "text_2",
+        "label": "Text 2"
+        },
+        {
+        "type": "html",
+        "id": "image_3",
+        "label": "SVG 3"
+        },
+        {
+        "type": "text",
+        "id": "text_3",
+        "label": "Text 3"
+        },
+  {
+"type": "html",
+"id": "image_4",
+"label": "SVG 4"
+},
+{
+"type": "text",
+"id": "text_4",
+"label": "Text 4"
+},
+  {
+"type": "html",
+"id": "image_5",
+"label": "SVG 5"
+},
+{
+"type": "text",
+"id": "text_5",
+"label": "Text 5"
+},
+  {
+"type": "html",
+"id": "image_6",
+"label": "SVG 6"
+},
+{
+"type": "text",
+"id": "text_6",
+"label": "Text 6"
+}
+		
+  ]
+}
+{% endschema %}
